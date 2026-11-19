@@ -22,6 +22,4 @@ jobs:
           list=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 30 --json number,title --jq '.[] | "- #\(.number) \(.title)"')
           gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "Merged. Open issues to review for next work:
 
-          ${list:-_none_}
-
-          @claude check these issues, confirm none are now resolved or blocked by this merge, and pick the next task."
+          ${list:-_none_}"
