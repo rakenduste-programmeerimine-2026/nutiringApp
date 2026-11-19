@@ -1,0 +1,8 @@
+# Never push to main
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Pushing to main is blocked. Open a PR from a feature branch."
+    exit 1
+  fi
+done
+npm run lint && npm run typecheck && npm test
