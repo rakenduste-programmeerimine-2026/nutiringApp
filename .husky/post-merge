@@ -1,0 +1,5 @@
+# After a merge/pull: have the agent check open issues for work to pick up
+echo ""
+echo "Merge detected. Open issues to review:"
+gh issue list --state open --limit 20 2>/dev/null || echo "(gh CLI unavailable)"
+echo "Agent: review the issues above, pick the next unblocked one, branch as feat/<issue>-<slug>."
