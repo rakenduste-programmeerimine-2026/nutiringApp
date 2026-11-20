@@ -3,143 +3,325 @@ import type { House, Step } from "../types";
 export const SIM_PIN = "1234";
 export const SCREEN_LOCK = "2580";
 
-const info = (text: Step["text"], extra: Partial<Step> = {}): Step => ({ type: "info", text, ...extra });
-const tap = (text: Step["text"], target: string, until: string, extra: Partial<Step> = {}): Step => ({
-  type: "do",
+const info = (text: Step["text"], target?: Step["target"], extra: Partial<Step> = {}): Step => ({
+  type: "info",
   text,
-  target,
-  until,
+  ...(target ? { target } : {}),
   ...extra,
 });
+const act = (
+  text: Step["text"],
+  target: Step["target"],
+  until: string | string[],
+  extra: Partial<Step> = {},
+): Step => ({ type: "do", text, target, until, ...extra });
 
-// NB: draft texts and selectors – to be aligned with the client prototype „Nutiküla – Nutiring".
+const NAV_HOME: Step["text"] = {
+  android: "Vajuta <b>●</b>, et minna avaekraanile tagasi.",
+  ios: "<b>Pühi alt üles</b>, et minna avakuvale tagasi.",
+};
+const NAV_HOME_TARGET = { android: ".nav-home", ios: ".homeind" };
+
+// Source: prototype „Nutiküla – Nutiring" (HOME.lessons) + client feedback 20.11.2026.
+// Lessons 1 (explanations, lock-screen buttons), 2 (notification icons, sound mode, Do Not Disturb),
+// 4 (brightness) and 7 (three buttons) are extended per the issue; their texts need client review.
 export const home: House = {
   title: "Avaekraan",
-  intro: "Siin õpid tundma telefoni avaekraani ja selle põhifunktsioone.",
   lessons: [
     {
-      title: "SIM PIN ja telefoni lahtilukustamine",
-      setup: "locked",
+      title: "SIM-kaardi PIN ja telefoni avamine",
+      setup: "sim",
       steps: [
-        info("SIM PIN on 4-numbriline kood, mis kaitseb su mobiilinumbrit. Ilma selleta ei saa telefoniga helistada."),
-        {
-          type: "do",
-          text: "Sisesta SIM PIN.",
-          popup: `Harjutuskood: ${SIM_PIN}`,
-          target: "[data-sim-pad]",
-          check: { kind: "simPin", value: SIM_PIN },
-          hint: "Vajuta numbreid ükshaaval ja lõpuks kinnita.",
-        },
-        info("Ekraanilukk on eraldi kood, mis kaitseb telefoni sisu, kui telefon on võõraste käes."),
-        {
-          type: "do",
-          text: "Sisesta ekraanilukk.",
-          popup: `Harjutuskood: ${SCREEN_LOCK}`,
-          target: "[data-lock-pad]",
-          check: { kind: "screenLock", value: SCREEN_LOCK },
-        },
-        info("Lukustusekraanil on ka nupud kaamera ja taskulambi jaoks. Neid saab kasutada ilma telefoni lahti lukustamata."),
+        info(
+          "Telefon on sisse lülitatud ja küsib <b>SIM-kaardi PIN-koodi</b>. Päris telefonis on see kood kirjas SIM-kaardi ümbrisel.",
+          ".pinbox",
+        ),
+        info(
+          "<b>SIM PIN</b> kaitseb sinu SIM-kaarti ja mobiilinumbrit. Ilma selle koodita ei saa telefoniga helistada ega mobiilset internetti kasutada.",
+          ".pinbox",
+        ),
+        act("Sisesta numbritega <b>1 2 3 4</b> ja vajuta <b>OK</b>.", ".numpad", "simOk", {
+          cardAt: "top",
+          popup: `Sinu harjutus-SIM-PIN on <b>${SIM_PIN}</b>`,
+          hint: "Vajuta numbreid 1, 2, 3, 4 ja siis OK.",
+        }),
+        info(
+          "See on <b>lukustuskuva</b>. Siin näed kellaaega ja kuupäeva ka siis, kui telefon on lukus.",
+          ".lock-time, .lock-date",
+        ),
+        info(
+          "Lukustuskuva all on kiirnupud (näiteks taskulamp ja kaamera). Neid saad kasutada ka lukus telefonil.",
+          ".lock-buttons",
+        ),
+        info(
+          "<b>Ekraanilukk</b> on eraldi kood, mis hoiab telefoni sisu võõraste eest. Seda küsitakse iga kord, kui telefoni avad.",
+          ".lock-time, .lock-date",
+        ),
+        act("Pane sõrm ekraani alaossa ja <b>pühi üles</b>. Võid ka lihtsalt vajutada.", ".swipeup", "unlock"),
+        act(
+          {
+            android: "Sisesta ekraaniluku kood <b>2 5 8 0</b> ja vajuta <b>OK</b>.",
+            ios: "Sisesta pääsukood <b>2 5 8 0</b>.",
+          },
+          ".numpad",
+          "passOk",
+          {
+            cardAt: "top",
+            popup: {
+              android: `Sinu harjutus-PIN-kood on <b>${SCREEN_LOCK}</b>`,
+              ios: `Sinu harjutus-pääsukood on <b>${SCREEN_LOCK}</b>`,
+            },
+            hint: "Vajuta numbreid 2, 5, 8, 0.",
+          },
+        ),
+        info("Telefon on lahti! See on <b>avaekraan</b>. Siit avad kõik rakendused.", ".home"),
       ],
     },
     {
-      title: "Olekuriba",
+      title: "Mis on ekraani ülaosas?",
       steps: [
-        info("Ekraani ülaosas on olekuriba: kell, akulaeng, võrk ja teavituste ikoonid."),
-        tap("Puuduta akuikooni.", "[data-status-battery]", "tap:battery"),
-        info("Väikesed ikoonid olekuribal näitavad, et sul on uusi teavitusi."),
-        tap(
-          { android: "Lülita telefon vaikseks režiimi.", ios: "Lülita telefon vaikseks küljel oleva lülitiga." },
-          "[data-sound-mode]",
-          "soundMode",
+        info(
+          "Ekraani kõige ülemises reas on <b>olekuriba</b>. Väikesed ikoonid näitavad telefoni olekut.",
+          ".sb",
         ),
-        tap("Lülita sisse režiim „Ära sega”.", "[data-dnd]", "dndOn"),
+        info("<b>Kellaaeg.</b> Siit näed alati, mis kell on.", ".sb-time"),
+        info("<b>Mobiililevi.</b> Mida rohkem pulki, seda parem on levi helistamiseks.", ".sb-signal"),
+        info("<b>Wi-Fi.</b> See märk tähendab, et telefon on ühendatud traadita internetiga.", ".sb-wifi"),
+        info(
+          {
+            android: "<b>Aku.</b> Number näitab, kui palju akut on alles. Kui see on väike, pane telefon laadima.",
+            ios: "<b>Aku.</b> Täis kast tähendab täis akut. Kui kast on peaaegu tühi, pane telefon laadima.",
+          },
+          ".sb-batt",
+        ),
+        info(
+          "<b>Teavituste ikoonid.</b> Olekuribale ilmub väike ikoon iga uue sõnumi või teate kohta, mida sa pole veel lugenud.",
+          ".sb-notif",
+        ),
+        info(
+          "<b>Helirežiim.</b> Kellukese või läbikriipsutatud kellukese ikoon näitab, kas telefon helisab või on vaikne.",
+          ".sb-sound",
+        ),
+        info(
+          "<b>Ära sega.</b> Kui see on sees, telefon ei helise ega näita teavitusi, kuni lülitad selle uuesti välja.",
+          ".sb-dnd",
+        ),
       ],
     },
     {
       title: "Teavitused",
+      setup: "sb:openNotif",
       steps: [
-        info("Teavitused annavad märku uutest sõnumitest ja rakenduste sündmustest."),
-        tap(
-          { android: "Tõmba olekuribalt sõrmega alla.", ios: "Tõmba ekraani ülaservast sõrmega alla." },
-          "[data-statusbar]",
-          "openNotifications",
+        act(
+          {
+            android: "Pane sõrm ekraani ülaserva ja <b>pühi alla</b>. Võid ka vajutada.",
+            ios: "Pane sõrm ekraani <b>vasakusse ülanurka</b> ja pühi alla. Võid ka vajutada.",
+          },
+          { android: ".sb", ios: ".sbl" },
+          "openNotif",
         ),
-        tap("Puuduta teavitust, et see avada.", "[data-notification]", "tap:notification"),
-        tap("Pühi üks teavitus ekraanilt ära.", "[data-notification]", "dismissNotification"),
+        info(
+          "<b>Teavitus</b> annab teada, et midagi on juhtunud. Siin kirjutas Mari Tamm sõnumi.",
+          ".notif.n1",
+        ),
+        info("Teavitusi saadavad ka teised rakendused, näiteks ilmateade.", ".notif.n2"),
+        act(
+          {
+            android: "Kui oled teavitused läbi lugenud, vajuta <b>Kustuta kõik</b>.",
+            ios: "Kui oled teavitused läbi lugenud, vajuta <b>Tühjenda kõik</b>.",
+          },
+          ".clearall",
+          "clearNotif",
+        ),
+        act(NAV_HOME, NAV_HOME_TARGET, "goHome"),
       ],
     },
     {
       title: "Kiirseaded",
+      setup: "sb:openQS",
       steps: [
-        info("Kiirseadetes saad kiiresti sisse ja välja lülitada näiteks WiFi, Bluetoothi ja taskulambi."),
-        tap(
-          { android: "Tõmba olekuriba kahe sõrmega alla.", ios: "Tõmba ekraani ülemisest paremast nurgast alla." },
-          "[data-statusbar]",
-          "openQuickSettings",
+        act(
+          {
+            android: "Pane sõrm ekraani ülaserva ja <b>pühi alla</b>. Võid ka vajutada.",
+            ios: "Pane sõrm ekraani <b>paremasse ülanurka</b> ja pühi alla. Võid ka vajutada.",
+          },
+          { android: ".sb", ios: ".sbr" },
+          "openQS",
         ),
-        tap("Muuda ekraani heledust liugurit lohistades.", "[data-brightness]", "brightness"),
-        tap("Lülita taskulamp sisse.", "[data-flashlight]", "flashlightOn"),
+        info(
+          {
+            android: "Need on <b>kiirseaded</b>. Siit lülitad kiiresti asju sisse ja välja. Sinine nupp tähendab, et see on sees.",
+            ios: "Need on <b>kiirseaded</b> (Juhtimiskeskus). Siit lülitad kiiresti asju sisse ja välja. Sinine nupp tähendab, et see on sees.",
+          },
+          ".qsgrid",
+        ),
+        info("<b>Wi-Fi:</b> traadita internet kodus või kohvikus.", "[data-tile=wifi]"),
+        info("<b>Mobiilne andmeside:</b> internet SIM-kaardi kaudu, kui Wi-Fit pole.", "[data-tile=data]"),
+        info("<b>Taskulamp:</b> telefoni tagaküljel süttib tuli.", "[data-tile=torch]"),
+        info("<b>Vaikne režiim:</b> telefon ei helise kõnede ja sõnumite peale.", "[data-tile=silent]"),
+        info(
+          {
+            android: "<b>Automaatne pööramine:</b> kui see on sees, keerab ekraan end koos telefoniga külili.",
+            ios: "<b>Pööramislukk:</b> kui see on sees, ei keera ekraan end külili.",
+          },
+          "[data-tile=rotate]",
+        ),
+        info("<b>Lennurežiim:</b> lülitab välja kõned, interneti ja Wi-Fi, näiteks lennukis.", "[data-tile=plane]"),
+        info("<b>Heledus:</b> lohista riba, et ekraan oleks heledam või tumedam.", ".t-bright"),
+        act("Proovi heledust! <b>Lohista heleduse liugurit</b> paremale või vasakule.", ".t-bright", "brightness"),
+        act("Proovi järele! Lülita <b>taskulamp</b> sisse.", "[data-tile=torch]", "tile:torch"),
+        act("Taskulamp põleb. Vajuta uuesti, et see <b>välja lülitada</b>.", "[data-tile=torch]", "tile:torch"),
+        act(
+          {
+            android: "Vajuta <b>●</b>, et kiirseaded sulgeda.",
+            ios: "<b>Pühi alt üles</b>, et Juhtimiskeskus sulgeda.",
+          },
+          NAV_HOME_TARGET,
+          "goHome",
+        ),
       ],
     },
     {
-      title: "Pikk vajutus",
+      title: "Pikk puudutus avaekraanil",
       steps: [
-        info("Paljudel asjadel on peidetud menüü. Selle avamiseks hoia sõrme ikoonil umbes sekund."),
-        tap("Hoia sõrme kaamera ikoonil.", "[data-app='camera']", "longPress:camera", {
-          hint: "Ära tõsta sõrme kohe üles – hoia all.",
+        act(
+          "<b>Hoia sõrme</b> ekraanil tühjal kohal umbes üks sekund, kuni midagi muutub.",
+          ".wallempty",
+          "longHome",
+          { hint: "Hoia sõrme all, ära lase kohe lahti." },
+        ),
+        info("Avanes <b>menüü</b>. Siin saad muuta avaekraani välimust.", ".lmenu", { os: "android" }),
+        info("<b>Taustapilt ja stiil:</b> vali ekraani taustale uus pilt ja värvid.", ".lm-wall", { os: "android" }),
+        info(
+          "<b>Vidinad:</b> väikesed aknad avaekraanil, näiteks kell, ilm või kalender.",
+          ".lm-widg",
+          { os: "android" },
+        ),
+        info("<b>Avaekraani seaded:</b> näiteks ikoonide suurus ja paigutus.", ".lm-set", { os: "android" }),
+        act("Menüü sulgemiseks <b>vajuta tühjale kohale</b> ekraanil.", ".menuclose", "closeMenu", {
+          os: "android",
         }),
-        tap("Vali menüüst üks valik.", "[data-context-menu] button", "tap:contextOption"),
+        info("Ikoonid hakkasid <b>värisema</b>. Nüüd saad avakuva muuta.", ".homegrid, .dock", { os: "ios" }),
+        info("<b>Pluss (+):</b> lisa avakuvale vidin, näiteks kell, ilm või kalender.", ".ie-plus", {
+          os: "ios",
+        }),
+        info("<b>Muuda:</b> vaheta taustapilti ja avakuva kujundust.", ".ie-edit", { os: "ios" }),
+        act("Kui oled valmis, vajuta <b>Valmis</b>.", ".ie-done", "closeMenu", { os: "ios" }),
       ],
     },
     {
       title: "Kõik rakendused ja otsing",
       steps: [
-        info("Kõik telefoni rakendused on ühes loendis. Sealt leiad ka need, mida avaekraanil pole."),
-        tap(
-          { android: "Tõmba avaekraanil alt üles.", ios: "Libista avaekraanil viimasest vaatest vasakule." },
-          "[data-home]",
-          "openAllApps",
+        info(
+          "Avaekraanil on ainult osa rakendusi. <b>Kõik rakendused</b> on eraldi kohas.",
+          ".homegrid, .dock",
         ),
-        tap("Puuduta otsinguriba ja kirjuta „kell”.", "[data-search]", "search:kell"),
-        tap(
-          { android: "Ava rakendus „Kell”.", ios: "Ava rakendus Clock (kell)." },
-          "[data-app='clock']",
-          "openApp:clock",
+        act("<b>Pühi ekraanil alt üles</b>, et näha kõiki rakendusi.", ".drawerhandle", "openDrawer", {
+          os: "android",
+        }),
+        act(
+          "<b>Pühi ekraanil vasakule</b>, kuni jõuad Rakenduste kogusse. Võid ka vajutada täppidele.",
+          ".pagedots",
+          "openDrawer",
+          { os: "ios" },
         ),
+        info(
+          {
+            android: "Siin on <b>kõik telefoni rakendused</b> tähestiku järjekorras.",
+            ios: "See on <b>Rakenduste kogu</b>. Siin on kõik telefoni rakendused.",
+          },
+          ".drawer .appgrid",
+        ),
+        act(
+          { android: "Vajuta ülal <b>otsinguribale</b>.", ios: "Vajuta nupule <b>Otsi</b>." },
+          { android: ".searchbar", ios: ".searchpill" },
+          "searchFocus",
+        ),
+        {
+          type: "do",
+          target: ".kb",
+          text: "Kirjuta klaviatuuril sõna <b>kell</b>.",
+          check: { kind: "searchQuery", value: "kell" },
+          hint: "Vajuta tähti k, e, l, l.",
+        },
+        act("Leitud! Vajuta rakendusele <b>Kell</b>, et see avada.", "[data-result=clock]", "open:clock"),
+        info("Kell on avatud. Nii leiad kiiresti iga rakenduse.", ".appscr"),
       ],
     },
     {
-      title: "Kolm nuppu",
+      title: "Kolm nuppu ja tagasi minek",
       steps: [
-        info("Telefoni all on kolm tegevust: tagasi, avaleht ja avatud rakendused."),
-        tap("Ava mõni rakendus.", "[data-app]", "openAnyApp"),
-        tap("Puuduta nuppu „Tagasi”.", "[data-nav='back']", "navBack"),
-        tap("Puuduta nuppu „Avaleht”.", "[data-nav='home']", "navHome"),
-        tap("Puuduta nuppu „Avatud rakendused”.", "[data-nav='recents']", "navRecents"),
+        act(
+          "Rakenduse avamiseks <b>vajuta selle ikoonile</b>. Ava <b>Kaamera</b>.",
+          ".dock [data-app=camera]",
+          "open:camera",
+        ),
+        info("Kaamera on avatud. Nüüd saaksid teha pilti.", ".camview"),
+        info(
+          "Ekraani all on <b>kolm nuppu</b>: ◀ <b>tagasi</b> läheb sammu tagasi, ● <b>avaleht</b> viib avaekraanile, ■ <b>avatud rakendused</b> näitab hiljuti avatud rakendusi.",
+          ".navbar",
+          { os: "android" },
+        ),
+        act("Vajuta <b>ringikujulist nuppu ●</b>, et minna tagasi avaekraanile.", ".nav-home", "goHome", {
+          os: "android",
+        }),
+        info(
+          "iPhone'il pole all nuppe. Avakuvale naasmiseks <b>pühi ekraani alumisest servast üles</b>.",
+          ".homeind",
+          { os: "ios" },
+        ),
+        act(
+          "Avakuvale naasmiseks <b>pühi ekraani alumisest servast üles</b>. Võid ka vajutada joonele.",
+          ".homeind",
+          "goHome",
+          { os: "ios" },
+        ),
+        info("Oled jälle avaekraanil. Nii saad igast rakendusest välja tulla.", ".home"),
       ],
     },
     {
-      title: "Avaekraani rakendused",
+      title: "Avaekraanil olevad rakendused",
       steps: [
-        info("Avaekraanil on sinu enim kasutatavad rakendused."),
-        tap("Ava rakendus avaekraanilt.", "[data-home] [data-app]", "openAnyApp"),
-        tap("Hoia ikooni all ja liiguta see teise kohta.", "[data-home] [data-app]", "moveIcon"),
+        info("<b>Telefon:</b> sellega helistad ja vastad kõnedele.", "[data-app=phone]"),
+        info(
+          "<b>Brauser</b> on rakendus, millega pääsed internetti ja saad vaadata veebilehti.",
+          "[data-app=browser]",
+        ),
+        info("<b>Kaamera:</b> sellega teed pilte ja videoid.", ".dock [data-app=camera]"),
+        info(
+          "<b>Seaded:</b> siin muudad telefoni seadeid, näiteks teksti suurust, helitugevust ja Wi-Fi ühendust.",
+          "[data-app=settings]",
+        ),
+        info("<b>Sõnumid:</b> siin loed ja kirjutad tekstisõnumeid (SMS).", "[data-app=messages]"),
+        info(
+          "<b>Kontaktid:</b> sinu telefoniraamat. Siin on inimeste nimed ja telefoninumbrid.",
+          "[data-app=contacts]",
+        ),
       ],
     },
     {
       title: "Ikooni lisamine avaekraanile",
+      setup: "drawer",
       steps: [
-        info("Sagedasti kasutatava rakenduse saad avaekraanile eraldi ikoonina lisada."),
-        tap(
-          { android: "Ava kõigi rakenduste loend.", ios: "Libista avaekraanil viimasest vaatest vasakule." },
-          "[data-home]",
-          "openAllApps",
+        info(
+          {
+            android: "Oled kõigi rakenduste vaates. Lisame <b>Kella</b> avaekraanile.",
+            ios: "Oled Rakenduste kogus. Lisame <b>Kella</b> avakuvale.",
+          },
+          ".drawer .appgrid",
         ),
-        tap("Hoia rakenduse ikooni all.", "[data-app='clock']", "longPress:clock"),
-        tap(
-          { android: "Vali „Lisa avaekraanile”.", ios: "Vali Add to Home Screen (lisa avaekraanile)." },
-          "[data-add-home]",
-          "addToHome",
+        act("<b>Hoia sõrme</b> Kella ikoonil, kuni avaneb menüü.", "[data-dapp=clock]", "longApp", {
+          hint: "Hoia sõrme all umbes üks sekund.",
+        }),
+        act(
+          { android: "Vajuta <b>Lisa avaekraanile</b>.", ios: "Vajuta <b>Lisa avakuvale</b>." },
+          ".ctx-add",
+          "addHome",
+        ),
+        info("Kell on nüüd avaekraanil!", ".homegrid [data-app=clock]"),
+        info(
+          "Ikooni <b>liigutamiseks</b> hoia sõrme ikoonil ja lohista see uude kohta. Kui lased sõrme lahti, jääb ikoon sinna.",
+          ".homegrid",
         ),
       ],
     },
