@@ -61,3 +61,26 @@ describe("browser content", () => {
     expect(SPAM_NOTIFICATIONS.length).toBeGreaterThan(0);
   });
 });
+
+describe("browser lesson events", () => {
+  it("uses the event names agreed in issue #26 (plus open:<app>, openSk etc.)", () => {
+    const allowed = new Set([
+      "searchFocus",
+      "pickSugg",
+      "openRes",
+      "fgLogin",
+      "openSk",
+      "pin1Ok",
+      "pin2Ok",
+      "allow",
+      "adClose",
+      "paymentCancel",
+      "notifOff",
+      "open:settings",
+    ]);
+    for (const l of browser.lessons)
+      for (const s of l.steps)
+        for (const u of [s.until ?? []].flat())
+          expect(allowed.has(u)).toBe(true);
+  });
+});

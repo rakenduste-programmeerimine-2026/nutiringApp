@@ -83,11 +83,12 @@ export const browser: House = {
           "Tahad küsida riigilt toetust. Alustame otsingust.",
           ".browser-search",
         ),
+        act("Vajuta <b>otsingukastile</b>.", ".browser-search", "searchFocus"),
         act(
-          "Kirjuta otsingusse <b>toetus</b> ja vajuta otsi.",
-          ".browser-search",
-          "search:toetus",
-          { hint: "Kirjuta sõna toetus ja vajuta otsingunuppu." },
+          "Kirjuta <b>toe</b> ja vali pakutud soovitus <b>toetus</b>.",
+          ".suggestions",
+          "pickSugg",
+          { hint: "Soovitused ilmuvad pärast kolme tähte." },
         ),
         info(
           `Tulemuste hulgas on kaks riigi lehte. Üks on <b>${SITES.realGov}</b> ja teine <b>${SITES.fakeGov}</b>.`,
@@ -97,7 +98,7 @@ export const browser: House = {
           "<b>OHUMÄRK:</b> Päris riigi lehed lõpevad „.ee”-ga. Aadress, mis lõpeb „.com”, on kahtlane.",
           ".result.fake",
         ),
-        act("Vali <b>õige</b> riigi leht.", ".result.real", "pick:real", {
+        act("Vali <b>õige</b> riigi leht.", ".result.real", "openRes", {
           hint: `Õige aadress lõpeb „.ee”-ga: ${SITES.realGov}.`,
         }),
         info(
@@ -106,7 +107,12 @@ export const browser: House = {
         act(
           "Vali sisselogimiseks <b>Smart-ID</b>.",
           ".login-smartid",
-          "login:smartid",
+          "fgLogin",
+        ),
+        act(
+          `Ava rakendus <b>${SITES.smartId}</b>.`,
+          ".open-smartkood",
+          "openSk",
         ),
         info(
           `Ekraanil on <b>kontrollkood</b>. Ava ${SITES.smartId} ja kontrolli, et kood oleks sama.`,
@@ -116,7 +122,7 @@ export const browser: House = {
         act(
           `Sisesta ${SITES.smartId} rakenduses <b>PIN1</b>.`,
           ".smartid-pad",
-          "pin1:ok",
+          "pin1Ok",
           {
             popup: `Harjutuse PIN1 on <b>${SMART_KOOD_PIN1}</b>`,
             hint: "PIN1 on lühem kood.",
@@ -127,11 +133,17 @@ export const browser: House = {
           `<b>OHUMÄRK:</b> Leht palub kinnitada makse <b>${PAYMENT.amount} ${PAYMENT.currency}</b> saajale „${PAYMENT.to}”. Sina ei ole midagi tellinud. Ära sisesta PIN2 koodi!`,
           ".payment",
         ),
-        act("Vajuta <b>Katkesta</b>.", ".payment-cancel", "payment:cancel", {
+        act("Vajuta <b>Katkesta</b>.", ".payment-cancel", "paymentCancel", {
           hint: "Ära kinnita makset. Vajuta Katkesta.",
         }),
         info(
           `Tubli! PIN2 (<b>${SMART_KOOD_PIN2}</b> harjutuses) sisestatakse ainult siis, kui sa ise midagi allkirjastad või maksad.`,
+        ),
+        act(
+          `Kui allkirjastad päris dokumendi, küsib ${SITES.smartId} <b>PIN2</b> koodi. Proovi seda: sisesta <b>PIN2</b>.`,
+          ".smartid-pad",
+          "pin2Ok",
+          { popup: `Harjutuse PIN2 on <b>${SMART_KOOD_PIN2}</b>` },
         ),
       ],
     },
@@ -145,12 +157,13 @@ export const browser: House = {
       ],
       steps: [
         info("Tahad leida koogiretsepti. Otsime selle internetist."),
+        act("Vajuta <b>otsingukastile</b>.", ".browser-search", "searchFocus"),
         act(
-          "Kirjuta otsingusse <b>koogi retsept</b>.",
-          ".browser-search",
-          "search:koogi retsept",
+          "Kirjuta <b>koo</b> ja vali soovitus <b>koogi retsept</b>.",
+          ".suggestions",
+          "pickSugg",
         ),
-        act("Ava esimene tulemus.", ".result:first-child", "pick:recipe"),
+        act("Ava esimene tulemus.", ".result:first-child", "openRes"),
         info(
           `Leht <b>${SITES.recipes}</b> avaneb. Ülal hüppab välja aken.`,
           ".permission",
@@ -162,7 +175,7 @@ export const browser: House = {
         act(
           "Vali <b>Luba</b>, et näha, mis juhtub.",
           ".permission-allow",
-          "permission:allow",
+          "allow",
           {
             hint: "Selles harjutuses võid julgelt Luba valida.",
           },
@@ -175,12 +188,20 @@ export const browser: House = {
           `<b>OHUMÄRK:</b> Need teavitused tulevad lehtedelt ${SITES.recipes} ja ${SITES.spam}. Nad lubavad auhindu ja imerohte. Ära vajuta neile!`,
           ".notif",
         ),
+        info("Lehel hüppab välja ka <b>reklaamaken</b>.", ".ad"),
+        warn(
+          "<b>OHUMÄRK:</b> Reklaamakna sulgemisnupp ✕ on väga väike. Ära vajuta reklaami enda peale, vajuta ainult väikesele ✕-le.",
+          ".ad",
+        ),
+        act("Sulge reklaamaken väikese <b>✕</b>-ga.", ".ad-close", "adClose", {
+          hint: "Otsi akna nurgast väike ✕.",
+        }),
         act(
           "Ava telefoni <b>seaded</b>, et teavitused ära keelata.",
           "[data-app=settings]",
           "open:settings",
         ),
-        act("Keela lehe teavitused.", ".notif-toggle", "notif:off"),
+        act("Keela lehe teavitused.", ".notif-toggle", "notifOff"),
         info("Rämpsteavitused on keelatud. Nii saad neist alati lahti."),
       ],
     },
