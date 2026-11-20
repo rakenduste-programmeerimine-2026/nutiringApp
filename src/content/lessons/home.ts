@@ -154,6 +154,12 @@ export const home: House = {
           ".notif.n2",
         ),
         act(
+          "Teavituse eemaldamiseks <b>pühi seda küljele</b>.",
+          ".notif.n2",
+          "dismiss",
+          { hint: "Pane sõrm teavitusele ja pühi paremale või vasakule." },
+        ),
+        act(
           {
             android:
               "Kui oled teavitused läbi lugenud, vajuta <b>Kustuta kõik</b>.",
@@ -352,6 +358,19 @@ export const home: House = {
           "open:clock",
         ),
         info("Kell on avatud. Nii leiad kiiresti iga rakenduse.", ".appscr"),
+        act(
+          "Kellas on mitu lehte. Vajuta <b>Alarms (äratused)</b>.",
+          ".clock-tab-alarms",
+          "alarms",
+        ),
+        act(
+          {
+            android: "Vajuta <b>Kell</b>, et minna tagasi kellaajale.",
+            ios: "Vajuta <b>‹ Clock (kell)</b>, et minna tagasi.",
+          },
+          ".clock-back",
+          "backClock",
+        ),
       ],
     },
     {
@@ -390,6 +409,20 @@ export const home: House = {
         info(
           "Oled jälle avaekraanil. Nii saad igast rakendusest välja tulla.",
           ".home",
+        ),
+        act(
+          {
+            android: "Vajuta nuppu <b>■</b>, et näha avatud rakendusi.",
+            ios: "Pühi alumisest servast üles ja <b>peatu keset ekraani</b>, et näha avatud rakendusi.",
+          },
+          { android: ".nav-recents", ios: ".homeind" },
+          "recents",
+        ),
+        act(
+          "Rakenduse sulgemiseks <b>pühi selle kaarti üles</b>.",
+          ".recents-card",
+          "closeCard",
+          { hint: "Pane sõrm kaardile ja pühi üles." },
         ),
       ],
     },
