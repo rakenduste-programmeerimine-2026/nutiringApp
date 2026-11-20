@@ -7,7 +7,11 @@ export const NUTIROBO_REPLIES = [
   "Väga tore sinuga tuttavaks saada! Jätkame õpetusega.",
 ] as const;
 
-const info = (text: Step["text"], target?: Step["target"], extra: Partial<Step> = {}): Step => ({
+const info = (
+  text: Step["text"],
+  target?: Step["target"],
+  extra: Partial<Step> = {},
+): Step => ({
   type: "info",
   text,
   ...(target ? { target } : {}),
@@ -42,13 +46,22 @@ export const messages: House = {
     {
       title: "Vestluste nimekiri",
       steps: [
-        info("See on <b>Sõnumite</b> rakendus. Siin on kõik sinu vestlused, uusim kõige ees.", ".clist"),
+        info(
+          "See on <b>Sõnumite</b> rakendus. Siin on kõik sinu vestlused, uusim kõige ees.",
+          ".clist",
+        ),
         info(
           "Kui vestlus on <b>paksus kirjas</b> ja selle juures on <b>sinine täpp</b>, on sulle tulnud uus lugemata sõnum.",
           "[data-c=nutirobo]",
         ),
-        info("Tavalises kirjas vestlus on juba <b>loetud</b>.", "[data-c=mari]"),
-        info("Paremal näed, <b>millal</b> viimane sõnum tuli.", "[data-c=mari] .tm"),
+        info(
+          "Tavalises kirjas vestlus on juba <b>loetud</b>.",
+          "[data-c=mari]",
+        ),
+        info(
+          "Paremal näed, <b>millal</b> viimane sõnum tuli.",
+          "[data-c=mari] .tm",
+        ),
         info("Selle nupuga alustad <b>uut vestlust</b>.", ".compose"),
       ],
     },
@@ -63,42 +76,88 @@ export const messages: House = {
           ".compose",
           "compose",
         ),
-        info("Siia võid kirjutada <b>nime või telefoninumbri</b>.", ".to-field"),
-        info("Allpool on sinu <b>kontaktid</b>. Inimese saad valida ka siit.", ".contact"),
-        act("Vali kontakt <b>Tiina Lepp</b>.", "[data-contact=tiina]", "pickContact"),
-        info("Vestlus Tiinaga on avatud. All kastis saad kirjutada sõnumi.", ".composer"),
+        info(
+          "Siia võid kirjutada <b>nime või telefoninumbri</b>.",
+          ".to-field",
+        ),
+        info(
+          "Allpool on sinu <b>kontaktid</b>. Inimese saad valida ka siit.",
+          ".contact",
+        ),
+        act(
+          "Vali kontakt <b>Tiina Lepp</b>.",
+          "[data-contact=tiina]",
+          "pickContact",
+        ),
+        info(
+          "Vestlus Tiinaga on avatud. All kastis saad kirjutada sõnumi.",
+          ".composer",
+        ),
       ],
     },
     {
       title: "Klaviatuuri kasutamine",
       setup: "chat:mari",
       steps: [
-        act("Vajuta <b>kirjutamiskastile</b>. Avaneb klaviatuur.", ".composer-input", "focus"),
-        act("<b>Suure algustähe</b> jaoks vajuta noolt ⇧.", "[data-k=shift]", "shift", {
-          show: ".composer",
-          cardAt: "top",
+        act(
+          "Vajuta <b>kirjutamiskastile</b>. Avaneb klaviatuur.",
+          ".composer-input",
+          "focus",
+        ),
+        act(
+          "<b>Suure algustähe</b> jaoks vajuta noolt ⇧.",
+          "[data-k=shift]",
+          "shift",
+          {
+            show: ".composer",
+            cardAt: "top",
+          },
+        ),
+        typed("Kirjuta sõna <b>Tere</b>.", "Tere", {
+          hint: "Vajuta tähti T, e, r, e. Kui eksid, vajuta ⌫.",
         }),
-        typed("Kirjuta sõna <b>Tere</b>.", "Tere", { hint: "Vajuta tähti T, e, r, e. Kui eksid, vajuta ⌫." }),
-        typed("Vajuta <b>tühikut</b>, et sõnad oleksid eraldi.", "Tere ", { target: "[data-k=space]" }),
+        typed("Vajuta <b>tühikut</b>, et sõnad oleksid eraldi.", "Tere ", {
+          target: "[data-k=space]",
+        }),
         act(
           "Täht <b>õ</b> peidab end klahvi <b>o</b> taha. <b>Hoia sõrme</b> klahvil <b>o</b>, kuni avaneb valik.",
           "[data-k=o]",
           "longKey:o",
-          { show: ".composer", cardAt: "top", hint: "Hoia sõrme all umbes üks sekund." },
+          {
+            show: ".composer",
+            cardAt: "top",
+            hint: "Hoia sõrme all umbes üks sekund.",
+          },
         ),
-        typed("Vali valikust <b>õ</b> ja kirjuta sõna <b>õhtust</b>.", "Tere õhtust", {
-          hint: "Pärast õ-d vajuta tähti h, t, u, s, t.",
-        }),
-        act("Kui kirjutasid valesti, saad tähe <b>kustutada</b>. Vajuta klahvi ⌫.", "[data-k=bksp]", "bksp", {
-          show: ".composer",
-          cardAt: "top",
-        }),
+        typed(
+          "Vali valikust <b>õ</b> ja kirjuta sõna <b>õhtust</b>.",
+          "Tere õhtust",
+          {
+            hint: "Pärast õ-d vajuta tähti h, t, u, s, t.",
+          },
+        ),
+        act(
+          "Kui kirjutasid valesti, saad tähe <b>kustutada</b>. Vajuta klahvi ⌫.",
+          "[data-k=bksp]",
+          "bksp",
+          {
+            show: ".composer",
+            cardAt: "top",
+          },
+        ),
         typed("Kirjuta kustutatud täht <b>t</b> tagasi.", "Tere õhtust"),
-        act("Numbrid ja märgid on eraldi klaviatuuril. Vajuta <b>123</b>.", "[data-k=mode123]", "mode123", {
-          show: ".composer",
-          cardAt: "top",
+        act(
+          "Numbrid ja märgid on eraldi klaviatuuril. Vajuta <b>123</b>.",
+          "[data-k=mode123]",
+          "mode123",
+          {
+            show: ".composer",
+            cardAt: "top",
+          },
+        ),
+        typed("Vajuta <b>hüüumärki !</b>", "Tere õhtust!", {
+          target: '[data-k="ch:!"]',
         }),
-        typed("Vajuta <b>hüüumärki !</b>", "Tere õhtust!", { target: '[data-k="ch:!"]' }),
         info(
           "Tubli! Kirjutasid „<b>Tere õhtust!</b>”. Tähtede juurde saad tagasi nupuga <b>ABC</b>.",
           ".composer-input",
@@ -120,7 +179,11 @@ export const messages: House = {
           "Kirjuta vastus, näiteks <b>Hästi, aitäh!</b> Siis vajuta <b>saatmisnuppu</b> ➤.",
           ".kb, .send",
           "sent",
-          { show: ".composer", cardAt: "top", hint: "Kirjuta midagi ja vajuta sinist noolt." },
+          {
+            show: ".composer",
+            cardAt: "top",
+            hint: "Kirjuta midagi ja vajuta sinist noolt.",
+          },
         ),
         act(
           "Nutirobo küsib: „Kuidas ma sind kutsun?” Kirjuta <b>oma nimi</b> ja saada sõnum.",
@@ -148,21 +211,39 @@ export const messages: House = {
           "<b>Häälsõnum</b> on lühike helisalvestis. Kirjutamise asemel saad oma sõnumi lihtsalt öelda.",
           ".composer",
         ),
-        act("Vajuta <b>mikrofoni nuppu</b>, et alustada salvestamist.", ".sendb.mic", "recStart", {
-          os: "android",
-        }),
+        act(
+          "Vajuta <b>mikrofoni nuppu</b>, et alustada salvestamist.",
+          ".sendb.mic",
+          "recStart",
+          {
+            os: "android",
+          },
+        ),
         act("Vajuta <b>+ nuppu</b>.", ".plus", "attachOpen", { os: "ios" }),
-        act("Vali <b>Heli</b>. Salvestamine algab kohe.", "[data-att=audio]", "recStart", { os: "ios" }),
+        act(
+          "Vali <b>Heli</b>. Salvestamine algab kohe.",
+          "[data-att=audio]",
+          "recStart",
+          { os: "ios" },
+        ),
         info(
           "Salvestamine käib. Nüüd räägi telefoni. <i>(Selles harjutuses heli tegelikult ei salvestata.)</i>",
           ".rec",
         ),
-        act("Kui oled rääkinud, vajuta <b>stopp-nuppu ■</b>.", ".rec-stop", "recStop"),
+        act(
+          "Kui oled rääkinud, vajuta <b>stopp-nuppu ■</b>.",
+          ".rec-stop",
+          "recStop",
+        ),
         info(
           "Enne saatmist saad sõnumit <b>kuulata ▶</b>. Kui see ei meeldi, vajuta <b>prügikasti</b> ja salvesta uuesti.",
           ".rec-play, .rec-del",
         ),
-        act("Vajuta <b>saatmisnuppu</b>, et häälsõnum saata.", ".rec-bar .send", "sent"),
+        act(
+          "Vajuta <b>saatmisnuppu</b>, et häälsõnum saata.",
+          ".rec-bar .send",
+          "sent",
+        ),
         info("Häälsõnum on saadetud! Mari saab seda kuulata.", ".bub.voice"),
       ],
     },
@@ -195,28 +276,49 @@ export const messages: House = {
           "Sõnumile saad vastata ka <b>reaktsiooniga</b>, näiteks 👍 või ❤️. Nii ei pea sa midagi kirjutama.",
           ".thread",
         ),
-        act("<b>Hoia sõrme</b> Mari sõnumil, kuni avaneb menüü.", "[data-last-in]", "longMsg", {
-          hint: "Hoia sõrme all umbes üks sekund.",
-        }),
+        act(
+          "<b>Hoia sõrme</b> Mari sõnumil, kuni avaneb menüü.",
+          "[data-last-in]",
+          "longMsg",
+          {
+            hint: "Hoia sõrme all umbes üks sekund.",
+          },
+        ),
         act("Vali üks <b>reaktsioon</b>.", ".reactions", "react"),
-        info("Sõnumi juures on nüüd sinu reaktsioon. Mari näeb seda kohe.", "[data-last-in]"),
+        info(
+          "Sõnumi juures on nüüd sinu reaktsioon. Mari näeb seda kohe.",
+          "[data-last-in]",
+        ),
       ],
     },
     {
       title: "Pildid, kontaktid ja asukoht",
       setup: "chat:mari",
       steps: [
-        info("<b>Plussi nupuga +</b> saad sõnumiga kaasa panna muid asju.", ".plus"),
-        info("Plussi vajutamisel avaneb selline <b>menüü</b>.", ".plus", { enter: "attachOpen" }),
+        info(
+          "<b>Plussi nupuga +</b> saad sõnumiga kaasa panna muid asju.",
+          ".plus",
+        ),
+        info("Plussi vajutamisel avaneb selline <b>menüü</b>.", ".plus", {
+          enter: "attachOpen",
+        }),
         info(
           {
-            android: "<b>Galerii:</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
+            android:
+              "<b>Galerii:</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
             ios: "<b>Fotod:</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
           },
           "[data-att=gallery]",
         ),
-        info("<b>Kaamera:</b> tee uus pilt ja saada see kohe.", "[data-att=camera]", { os: "ios" }),
-        info("<b>Kontakt:</b> saada kellegi nimi ja telefoninumber.", "[data-att=contact]"),
+        info(
+          "<b>Kaamera:</b> tee uus pilt ja saada see kohe.",
+          "[data-att=camera]",
+          { os: "ios" },
+        ),
+        info(
+          "<b>Kontakt:</b> saada kellegi nimi ja telefoninumber.",
+          "[data-att=contact]",
+        ),
         info(
           "<b>Asukoht:</b> näita kaardil, kus sa praegu oled. Kasulik, kui keegi tuleb sulle järele.",
           "[data-att=location]",
@@ -231,15 +333,22 @@ export const messages: House = {
           "Sulle saadeti <b>kinnituskood</b>. Selliseid koode küsitakse näiteks e-poes sisse logides.",
           ".bub.in",
         ),
-        act("<b>Hoia sõrme</b> sõnumil, kuni avaneb menüü.", "[data-last-in]", "longMsg", {
-          hint: "Hoia sõrme all umbes üks sekund.",
-        }),
+        act(
+          "<b>Hoia sõrme</b> sõnumil, kuni avaneb menüü.",
+          "[data-last-in]",
+          "longMsg",
+          {
+            hint: "Hoia sõrme all umbes üks sekund.",
+          },
+        ),
         act("Vajuta <b>Kopeeri</b>.", "[data-ctx=copy]", "copy"),
         info(
           "Kood on kopeeritud. Kleepimiseks <b>hoia sõrme</b> kastil, kuhu koodi vaja on, ja vali <b>Kleebi</b>.",
           ".composer-input",
         ),
-        info("<b>Tähtis!</b> Ära kunagi ütle koodi kellelegi telefonis ega saada seda kellelegi edasi."),
+        info(
+          "<b>Tähtis!</b> Ära kunagi ütle koodi kellelegi telefonis ega saada seda kellelegi edasi.",
+        ),
       ],
     },
     {
@@ -259,7 +368,12 @@ export const messages: House = {
           ".del-btn",
           "delAsk",
         ),
-        act("Telefon küsib üle. Vajuta <b>Kustuta</b>.", ".confirm-del", "deleted", { cardAt: "bottom" }),
+        act(
+          "Telefon küsib üle. Vajuta <b>Kustuta</b>.",
+          ".confirm-del",
+          "deleted",
+          { cardAt: "bottom" },
+        ),
         info("Vestlus on kustutatud.", ".clist"),
       ],
     },
@@ -287,7 +401,12 @@ export const messages: House = {
           "[data-menu=block]",
           "blockAsk",
         ),
-        act("Kinnita, et soovid saatja <b>blokeerida</b>.", ".confirm-block", "blocked", { cardAt: "bottom" }),
+        act(
+          "Kinnita, et soovid saatja <b>blokeerida</b>.",
+          ".confirm-block",
+          "blocked",
+          { cardAt: "bottom" },
+        ),
         info(
           "Saatja on blokeeritud ja ei saa sulle enam kirjutada. Kelmuste äratundmist saad harjutada majas <b>Küberturvalisus</b>.",
           ".thread",

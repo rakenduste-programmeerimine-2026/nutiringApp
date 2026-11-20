@@ -16,18 +16,25 @@ describe("lesson content", () => {
   for (const [name, house] of Object.entries(houses)) {
     describe(name, () => {
       it("every non-soon lesson has at least one step", () => {
-        for (const l of house.lessons.filter((x) => !x.soon)) expect(l.steps.length).toBeGreaterThan(0);
+        for (const l of house.lessons.filter((x) => !x.soon))
+          expect(l.steps.length).toBeGreaterThan(0);
       });
 
       it("every do step has until or check", () => {
         for (const l of house.lessons)
-          for (const s of l.steps) if (s.type === "do") expect(Boolean(s.until || s.check)).toBe(true);
+          for (const s of l.steps)
+            if (s.type === "do") expect(Boolean(s.until || s.check)).toBe(true);
       });
 
       it("every Text object has android and ios", () => {
         for (const l of house.lessons)
           for (const s of l.steps)
-            for (const t of [...asList(s.text), ...asList(s.target), ...asList(s.popup), ...asList(s.hint)])
+            for (const t of [
+              ...asList(s.text),
+              ...asList(s.target),
+              ...asList(s.popup),
+              ...asList(s.hint),
+            ])
               if (typeof t === "object") {
                 expect(t.android).toBeTruthy();
                 expect(t.ios).toBeTruthy();

@@ -4,5 +4,7 @@ import Home from "@/app/page";
 
 it("renders the app heading", () => {
   render(<Home />);
-  expect(screen.getByRole("heading", { name: "nutiringApp" })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: "nutiringApp" }),
+  ).toBeInTheDocument();
 });
