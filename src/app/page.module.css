@@ -1,0 +1,78 @@
+/* Start page – prototype classes .start, .vname, .tag, .oschoice, .osbtn */
+.start {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 84px;
+}
+
+.name {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--navy);
+  margin-top: -6px;
+}
+
+.tag {
+  font-size: 26px;
+  font-weight: 800;
+  max-width: 520px;
+}
+
+.question {
+  font-size: 28px;
+  margin-top: 28px;
+}
+
+.choice {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.osbtn {
+  width: 220px;
+  padding: 24px 16px;
+  border: 4px solid var(--navy);
+  border-radius: 28px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--navy);
+  transition:
+    transform 0.1s,
+    background 0.15s;
+}
+
+.osbtn:hover {
+  background: var(--pale);
+}
+
+.osbtn:active {
+  transform: scale(0.97);
+}
+
+.osbtn svg {
+  width: 70px;
+  height: 110px;
+}
+
+.osbtn small {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink2);
+}
