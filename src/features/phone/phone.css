@@ -1,0 +1,364 @@
+/* Phone replica styles, copied from the prototype.
+   GLOBAL class names on purpose: the lessons (src/content/lessons) find
+   elements by these classes (.kb, .sb-time, .homeind …), and CSS Modules
+   would rename them. Everything inside the phone is scoped under .phone. */
+
+/* ---------- lesson screen layout ---------- */
+.lscreen {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 0;
+  min-height: 0;
+  position: relative;
+}
+.phonewrap {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.phone {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* the lesson engine handles swipes itself */
+}
+.phscreen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.phlayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+.guide {
+  display: none;
+}
+@media (min-width: 900px) {
+  .stage {
+    padding: 20px;
+  }
+  .phonewrap {
+    width: auto;
+    height: 100%;
+    align-items: center;
+  }
+  .phone {
+    height: min(800px, 100%);
+    width: auto;
+    aspect-ratio: 9 / 19.2;
+    border-radius: 44px;
+    border: 12px solid #1b1f2a;
+    box-shadow: 0 20px 50px rgba(3, 35, 106, 0.18);
+  }
+  .guide {
+    display: block;
+    width: 400px;
+    flex: none;
+    align-self: center;
+  }
+}
+
+/* ---------- replica basics ---------- */
+.phone .ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: "Roboto", "Nunito", system-ui, sans-serif;
+  color: #1d1d1f;
+}
+.phone.ios .ph {
+  font-family: -apple-system, "SF Pro Text", "Nunito", system-ui, sans-serif;
+}
+.phone button {
+  font: inherit;
+  color: inherit;
+}
+.phone .wall {
+  background: linear-gradient(160deg, #9db7f5 0%, #c9d8fb 45%, #f4e9d8 100%);
+}
+.phone .wall-ios {
+  background: linear-gradient(170deg, #7d9df0 0%, #b9c9f7 50%, #f6dccb 100%);
+}
+
+/* ---------- status bar ---------- */
+.phone .sb {
+  height: 34px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  position: relative;
+  z-index: 5;
+}
+.phone .sb .sbl,
+.phone .sb .sbr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 4px;
+}
+.phone .sb svg {
+  height: 15px;
+  width: auto;
+  display: block;
+}
+.phone .sb.light {
+  color: #fff;
+}
+.phone.ios .sb {
+  height: 44px;
+  padding: 0 26px;
+}
+.phone .sbi {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border-radius: 6px;
+  padding: 2px;
+}
+.phone .batt {
+  font-size: 13px;
+}
+.phone .sb-notifs {
+  gap: 0;
+}
+.phone .sbn {
+  display: inline-flex;
+  margin-left: 3px;
+}
+.phone .sbn svg {
+  height: 13px;
+}
+
+/* ---------- navigation ---------- */
+.phone .navbar {
+  height: 46px;
+  flex: none;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.phone .navbar button {
+  width: 64px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: none;
+  border: none;
+}
+.phone .navbar svg {
+  width: 20px;
+  height: 20px;
+}
+.phone .navbar.dark {
+  color: #fff;
+}
+.phone .homeind {
+  height: 30px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone .homeind i {
+  display: block;
+  width: 134px;
+  height: 5px;
+  border-radius: 3px;
+  background: #111;
+}
+.phone .homeind.light i {
+  background: #fff;
+}
+
+/* ---------- app icons ---------- */
+.phone .app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  padding: 3px 0;
+  border-radius: 14px;
+}
+.phone .app span {
+  text-align: center;
+  line-height: 1.15;
+  max-width: 78px;
+}
+.phone .app .ic {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.phone.ios .app .ic {
+  border-radius: 14px;
+  width: 58px;
+  height: 58px;
+}
+.phone .ic svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* ---------- keyboard ---------- */
+.phone .kb {
+  position: relative;
+  flex: none;
+  background: #e8eaf0;
+  padding: 6px 3px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.phone.ios .kb {
+  background: #d1d4db;
+}
+.phone .krow {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+.phone .key {
+  flex: 1;
+  max-width: 36px;
+  height: 44px;
+  border: none;
+  border-radius: 7px;
+  background: #fff;
+  font-size: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+  font-family: inherit;
+  padding: 0;
+}
+.phone.android .key {
+  border-radius: 8px;
+}
+.phone .key.wide {
+  max-width: none;
+  flex: 1.5;
+  background: #c9cdd6;
+  font-size: 15px;
+}
+.phone.ios .key.wide {
+  background: #abb0bc;
+}
+.phone .key.space {
+  max-width: none;
+  flex: 5;
+  font-size: 14px;
+  color: #555;
+}
+.phone .key.on {
+  background: #fff;
+  color: #0b57d0;
+}
+.phone .key svg {
+  width: 20px;
+  height: 20px;
+}
+.phone .key:active {
+  background: #c9cdd6;
+}
+/* Each character key sits in a slot; the slot is the anchor for the
+   accent popup so it appears right above the held key. */
+.phone .keyslot {
+  position: relative;
+  flex: 1;
+  max-width: 36px;
+  display: flex;
+}
+.phone .keyslot .key {
+  max-width: none;
+  width: 100%;
+}
+.phone .accpop {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  z-index: 5;
+}
+/* letter under the finger while sliding */
+.phone .accpop button.sel {
+  background: #0b57d0;
+  color: #fff;
+}
+/* near the keyboard edges: align with the key's side instead of centring */
+.phone .accpop.at-left {
+  left: 0;
+  transform: none;
+}
+.phone .accpop.at-right {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.phone .accpop button {
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 10px;
+  font-size: 22px;
+  background: #eef2fb;
+  color: #111;
+}
+.phone .emojigrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding: 8px;
+}
+.phone .emojigrid button {
+  font-size: 28px;
+  height: 46px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+}
+.phone .emojigrid button:active {
+  background: #fff;
+}
