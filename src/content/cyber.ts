@@ -22,7 +22,8 @@ export type CyberTask = {
   id: string;
   kind: TaskKind;
   answer: TaskAnswer;
-  question: string;
+  /** Tiia's question; SMS tasks have none, use taskQuestion() */
+  question?: string;
   /** sender / meta / text may contain [[n|text]] sign markers */
   from?: string;
   meta?: string;
@@ -34,8 +35,8 @@ export type CyberTask = {
 
 const KUBER_TIP: Sign = {
   ref: 0,
-  title: "Harjuta Küberbrauseris",
-  body: "Veebilehtede kontrollimist saad harjutada majas Küberturvalisus, ruumis Küberbrauser.",
+  title: "Õpi rohkem",
+  body: "Kuidas internetis turvaliselt liikuda, saad harjutada <b>Küberbrauseri</b> tundides siinsamas majas.",
   tone: "tip",
 };
 
@@ -44,7 +45,6 @@ export const SCAM_SMS: CyberTask[] = [
     id: "omniva",
     kind: "sms",
     answer: "scam",
-    question: "Mulle tuli selline sõnum. Kas see on kelmus?",
     from: "[[1|rexdpyegf@outlook.com]]",
     meta: "iMessage · teisipäev 14:46",
     text: "Hea klient,\n\nVabandame ebamugavuste pärast. [[2|Teie pakk on saabunud kohalikku lattu, kuid aadressiteave on puudulik]] ja seda ei saa kohale toimetada.\n\n[[3|Vastake Y-le 24 tunni jooksul]], et kinnitada, et olete aadressi muutmiseks valmis, ja klõpsake järgmisel lingil: [[4|https://omneva.cc/ee]]\n\n[[5|Töödelge seda esimesel võimalusel, et vältida paki tagastamist.]]\n\nHead päeva!",
@@ -80,7 +80,6 @@ export const SCAM_SMS: CyberTask[] = [
     id: "ppa-trahv",
     kind: "sms",
     answer: "scam",
-    question: "Mulle tuli trahviteade. Kas see on kelmus?",
     from: "[[1|shannonwitte6889@gloriatlittle.com]]",
     meta: "iMessage · neljapäev 10:03",
     text: "PPA: Registreerisime 01.09.2025 kell 11:09 kiiruseületamise Tallinn-Tartu teel. Kiiruspiirang 90 km/h. Teie kiirus 109 km/h. [[2|Teie kui sõiduki omanikule]] on määratud trahv. Palun vaadake trahv kohe üle, külastades allolevat linki: [[3|ria.etoimik-ee-tatru.com]] Lingi aktiveerimiseks vastake PPA-ga või kleepige link oma brauserisse. [[4|Selle teate ignoreerimine on ebaseaduslik.]]",
@@ -111,25 +110,29 @@ export const SCAM_SMS: CyberTask[] = [
     id: "telegram",
     kind: "sms",
     answer: "scam",
-    question: "Mulle tuli selline sõnum. Kas see on kelmus?",
     from: "[[1|Telegram]]",
-    meta: "Tekstsõnum · kolmapäev 09:12",
-    text: "Your Telegram account has [[2|violated platform rules and will be closed if not verified within 6 hours]]. Go to [[3|https://telergmao.top]] to verify now.",
+    meta: "Tekstsõnum · täna 8:31",
+    text: "[[2|Your Telegram account has violated platform rules]] and will be closed if not verified [[3|within 6 hours]]. Go to [[4|https://telergmao.top]] to verify now.",
     signs: [
       {
         ref: 1,
-        title: "Võõrkeelne sõnum",
-        body: "Sõnum on inglise keeles, kuigi päris teenus kirjutaks sulle sinu keeles.",
+        title: "Saatja nimi võib olla võlts",
+        body: "Saatja nimeks saab kirjutada ükskõik mida. Telegram ei sulge kontosid SMS-i teel.",
       },
       {
         ref: 2,
-        title: "Ajaline surve ja hirmutamine",
-        body: "„Konto suletakse 6 tunni jooksul”: kelmid tahavad, et sa ei jõuaks järele mõelda.",
+        title: "Võõras keel ja hirmutamine",
+        body: "Sõnum on inglise keeles ja ähvardab konto sulgemisega.",
       },
       {
         ref: 3,
-        title: "Kahtlane link",
-        body: "Aadress „telergmao.top” ei ole Telegrami oma. Päris ettevõtte aadress lõpeb tema enda nimega.",
+        title: "Ajaline surve",
+        body: "„6 tunni jooksul”: sind kiirustatakse, et sa ei jõuaks järele mõelda.",
+      },
+      {
+        ref: 4,
+        title: "Vale link",
+        body: "„telergmao.top”: tähed on segamini ja lõpp on võõras. See ei ole Telegrami leht.",
       },
     ],
   },
@@ -137,25 +140,24 @@ export const SCAM_SMS: CyberTask[] = [
     id: "tervisekassa",
     kind: "sms",
     answer: "scam",
-    question: "Mulle tuli selline sõnum. Kas see on kelmus?",
     from: "[[1|+66 96-630]]",
-    meta: "Tekstsõnum · esmaspäev 15:20",
-    text: "Hea lapsevanem! Sinu laps on vanuses, mil ootame teda perearsti juurde laste plaanilisse tervisekontrolli. [[2|Broneeri aeg juba täna]]: [[3|www.terviseportaal.ee]]. Tervisekassa",
+    meta: "Tekstsõnum · eile 17:20",
+    text: "[[3|Hea lapsevanem!]] Sinu laps on vanuses, mil ootame teda perearsti juurde laste plaanilisse tervisekontrolli. Broneeri aeg juba täna: [[2|www.terviseportaal.ee]]. Tervisekassa",
     signs: [
       {
         ref: 1,
         title: "Välismaa number",
-        body: "Number +66 ei ole Eesti number. Eesti numbrid algavad +372-ga. Tervisekassa ei saada sõnumeid Tai numbrilt.",
+        body: "+66 on Tai suunakood. Eesti numbrid algavad +372-ga ja Eesti asutused ei saada sõnumeid välismaa numbrilt.",
       },
       {
         ref: 2,
-        title: "Kiirustamine",
-        body: "Sind suunatakse tegutsema kohe, „juba täna”.",
+        title: "Ära vajuta lingile",
+        body: "Kui tahad aega broneerida, mine ise ametlikule lehele või helista oma perearstile.",
       },
       {
         ref: 3,
-        title: "Link ilma https-ita",
-        body: "Link on kirjutatud nii, et seda on lihtne võltsida. Ava terviseportaal alati ise oma brauseris või rakenduses.",
+        title: "Üldine pöördumine",
+        body: "„Hea lapsevanem” tähendab, et sama sõnum saadeti paljudele korraga.",
       },
     ],
   },
@@ -163,25 +165,24 @@ export const SCAM_SMS: CyberTask[] = [
     id: "parkimine",
     kind: "sms",
     answer: "scam",
-    question: "Mulle tuli selline sõnum. Kas see on kelmus?",
     from: "[[1|PARKIMINE]]",
-    meta: "Tekstsõnum · neljapäev 11:40",
-    text: "Tere, [[2|Teie sõidukile]] on registreeritud (02.01.2026) maksmata parkimistrahv, vaata trahvi siit [[3|https://s.id/PARKIMINE-EE]]",
+    meta: "Tekstsõnum · täna 12:05",
+    text: "Tere, Teie sõidukile on registreeritud (02.01.2026) [[2|maksmata parkimistrahv]], vaata trahvi siit [[3|https://s.id/PARKIMINE-EE]]",
     signs: [
       {
         ref: 1,
-        title: "Tundmatu saatja",
-        body: "Saatja on lihtsalt sõna „PARKIMINE”, mitte tuntud ettevõte või ametiasutus.",
+        title: "Üldine saatja",
+        body: "Pole kirjas, mis firma või omavalitsus trahvi tegi.",
       },
       {
         ref: 2,
-        title: "Pole sõiduki numbrimärki",
-        body: "Päris trahviteates on alati kirjas auto numbrimärk.",
+        title: "Pole numbrimärki ega summat",
+        body: "Päris trahviteates on auto numbrimärk, summa ja koht.",
       },
       {
         ref: 3,
         title: "Lühendatud link",
-        body: "Lühendatud lingi (s.id) puhul sa ei näe, kuhu see päriselt viib. Ära vajuta sellele.",
+        body: "„s.id/…” peidab tegeliku aadressi. Sa ei näe, kuhu link viib.",
       },
     ],
   },
@@ -192,7 +193,6 @@ export const SAFE_SMS: CyberTask[] = [
     id: "autokaubad24",
     kind: "sms",
     answer: "safe",
-    question: "Nüüd tuli veel üks sõnum. Kas see on kelmus?",
     from: "[[1|AK24.ee]]",
     meta: "Tekstsõnum · reede 12:53",
     text: "Autokaubad24 tellimus [[2|TEE2542650]] on valmis. Tulge tellimusele järele [[3|aadressile Hundipea 5 E-R 09.00-18.00]]. Vajalik isikut tõendav dokument.",
@@ -223,7 +223,6 @@ export const SAFE_SMS: CyberTask[] = [
     id: "monefit",
     kind: "sms",
     answer: "safe",
-    question: "Sain sõnumi oma laenufirmalt. Kas see on kelmus?",
     from: "[[1|Monefit]]",
     meta: "Tekstsõnum · 19. dets 13:01",
     text: "Tiia, Sulle nüüd uus intressimäär alla 25%. Sinu konto on kasutusvalmis. Lisainfo: [[2|monefit.ee]] [[3|SMS loobumiseks: +3726888222]]",
@@ -273,8 +272,8 @@ export const WEB_TASKS: CyberTask[] = [
       },
       {
         ref: 3,
-        title: "„Sponsitud” ei tähenda turvalist",
-        body: "Mõlemad tulemused olid sponsitud. Sponsitud tähendab, et keegi maksis, et olla esimene. Ka kelmid saavad seda teha.",
+        title: "Mida tähendab „Sponsitud”?",
+        body: "Sponsitud on <b>reklaam</b>: keegi maksis, et tema leht oleks otsingus eespool. Siin olid sponsitud <b>mõlemad</b> tulemused, ka päris Coop Panga oma. Kelmid kasutavad sponsitud reklaame, et oma võltslehte esile tõsta. Seega ära usalda tulemust ainult sellepärast, et see on kõige ees.",
       },
       {
         ref: 0,
@@ -397,6 +396,27 @@ export function pickTasks(rng: () => number = Math.random): CyberTask[] {
   if (rng() < 0.5) sms.reverse();
   return [...sms, pickOne(WEB_TASKS, rng), pickOne(CALL_TASKS, rng)];
 }
+
+/** What Tiia says when a task starts. SMS tasks depend on their position in the round. */
+export function taskQuestion(task: CyberTask, index: number): string {
+  return (
+    task.question ??
+    (index === 0
+      ? "Mulle tuli selline sõnum. Kas see on kelmus?"
+      : "Nüüd tuli veel üks sõnum. Kas see on kelmus?")
+  );
+}
+
+/** How to take a screenshot of the checklist page, per system. */
+export const SCREENSHOT_HELP = {
+  title: "Tee sellest lehest kuvatõmmis",
+  intro: "Nii jääb nimekiri sinu telefoni pildina alles.",
+  android:
+    "Vajuta <b>korraga</b> toitenuppu (1) ja helitugevuse vähendamise nuppu (2). Ekraan vilgatab ja pilt salvestub galeriisse.",
+  ios: "Vajuta <b>korraga</b> külgnuppu (1) ja helitugevuse suurendamise nuppu (2). Ekraan vilgatab ja pilt salvestub rakendusse Fotod.",
+  computer:
+    "Kui kasutad arvutit, vaata pilti ja proovi seda hiljem oma telefonis.",
+} as const;
 
 export const CHECKLIST: string[] = [
   "Kas sõnum tuli ootamatult?",

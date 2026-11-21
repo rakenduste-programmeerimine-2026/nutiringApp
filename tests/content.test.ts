@@ -57,3 +57,16 @@ describe("lesson content", () => {
     expect(messages.lessons[6].title).toBe("Sõnumile reageerimine");
   });
 });
+
+describe("Nutirobo steps", () => {
+  it("every botSay step points at a fixed reply", async () => {
+    const { NUTIROBO_REPLIES } = await import("@/content/lessons/messages");
+    const idx: number[] = [];
+    for (const l of messages.lessons)
+      for (const s of l.steps)
+        if (s.enter?.startsWith("botSay:"))
+          idx.push(Number(s.enter.split(":")[1]));
+    expect(idx).toEqual([0, 1, 2]);
+    for (const i of idx) expect(NUTIROBO_REPLIES[i]).toBeTruthy();
+  });
+});

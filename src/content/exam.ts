@@ -243,13 +243,13 @@ export const EXAM: Record<ExamTopicId, ExamQuestion[]> = {
       question: "Kuidas kirjutada telefoni klaviatuuril tähte „õ”?",
       options: [
         "Seda ei saa telefonis kirjutada",
-        "Hoida klahvi „o” pikalt all ja valida „õ”",
+        "Hoia sõrme o-tähel ja vali avanevast aknast õ",
         "Tuleb kirjutada „o” ja „~”",
         "Tuleb vajutada 123",
       ],
       answer: 1,
       explanation:
-        "Hoia klahvi „o” pikalt all, siis avaneb valik ja sealt saad valida „õ”.",
+        "Hoia sõrme o-tähel, siis avaneb aken, kust saad valida õ või ö.",
     },
     {
       image: { kind: "icon", icon: "plus" },
@@ -306,11 +306,12 @@ export const EXAM: Record<ExamTopicId, ExamQuestion[]> = {
         from: "AK24.ee",
         text: "Autokaubad24 tellimus TEE2542650 on valmis. Tulge tellimusele järele aadressile Hundipea 5 E-R 09.00-18.00. Vajalik isikut tõendav dokument.",
       },
-      question: "Tellisid autoosa. Nüüd tuli see sõnum. Kas see on kelmus?",
+      question:
+        "Sa tellisid hiljuti midagi Autokaubad24 e-poest. Kas see sõnum on kelmus?",
       options: YES_NO,
       answer: 1,
       explanation:
-        "See ei ole kelmus: sõnumis on tellimuse number, selge aadress ja kellaajad ning sind ei suunata lingile ega paluta maksta.",
+        "See ei ole kelmus: sõnumis on tellimuse number ja aadress, pole linki ega rahasoovi.",
     },
     {
       image: {

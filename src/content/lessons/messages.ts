@@ -1,45 +1,47 @@
-import type { House, Step } from "../types";
+import type { House, Step, Text } from "../types";
 
-/** Fixed Nutirobo conversation (order matters). */
+/**
+ * Fixed Nutirobo conversation. A step with `enter: "botSay:<index>"` makes Nutirobo
+ * send NUTIROBO_REPLIES[index] when the step starts.
+ */
 export const NUTIROBO_REPLIES = [
   "Tere! Kuidas läheb?",
   "Kuidas ma sind kutsun?",
   "Väga tore sinuga tuttavaks saada! Jätkame õpetusega.",
 ] as const;
 
-const info = (
-  text: Step["text"],
-  target?: Step["target"],
-  extra: Partial<Step> = {},
-): Step => ({
+
+const info = (text: Text, target?: Text, extra: Partial<Step> = {}): Step => ({
   type: "info",
   text,
   ...(target ? { target } : {}),
   ...extra,
 });
 const act = (
-  text: Step["text"],
-  target: Step["target"],
+  text: Text,
+  target: Text,
   until: string | string[],
   extra: Partial<Step> = {},
 ): Step => ({ type: "do", text, target, until, ...extra });
-const typed = (
-  text: Step["text"],
-  value: string,
+/** Keyboard step: card on top so the text field stays visible. */
+const kb = (
+  text: Text,
+  target: Text,
+  done: { until: string } | { input: string },
   extra: Partial<Step> = {},
 ): Step => ({
   type: "do",
   text,
-  target: ".kb",
+  target,
   show: ".composer",
   cardAt: "top",
-  check: { kind: "input", value },
+  ...("until" in done
+    ? { until: done.until }
+    : { check: { kind: "input", value: done.input } }),
   ...extra,
 });
 
-// Source: prototype „Nutiküla – Nutiring" (MSG.lessons) + client feedback 20.11.2026.
-// NB: lesson 3 („õ" via long press on „o") and the new lesson 7 (reactions) follow the issue,
-// their texts need client review.
+// Source: prototype „Nutiküla – Nutiring" (MSG.lessons), version 20.11.2026.
 export const messages: House = {
   title: "Sõnumid",
   lessons: [
@@ -104,59 +106,61 @@ export const messages: House = {
           ".composer-input",
           "focus",
         ),
-        act(
-          "<b>Suure algustähe</b> jaoks vajuta noolt ⇧.",
-          "[data-k=shift]",
-          "shift",
-          {
-            show: ".composer",
-            cardAt: "top",
-          },
-        ),
-        typed("Kirjuta sõna <b>Tere</b>.", "Tere", {
-          hint: "Vajuta tähti T, e, r, e. Kui eksid, vajuta ⌫.",
+        kb("<b>Suure algustähe</b> jaoks vajuta noolt ⇧.", "[data-k=shift]", {
+          until: "shift",
         }),
-        typed("Vajuta <b>tühikut</b>, et sõnad oleksid eraldi.", "Tere ", {
-          target: "[data-k=space]",
+        kb(
+          "Kirjuta sõna <b>Tere</b>.",
+          ".kb",
+          { input: "Tere" },
+          {
+            hint: "Vajuta tähti T, e, r, e. Kui eksid, vajuta ⌫.",
+          },
+        ),
+        kb(
+          "Vajuta <b>tühikut</b>, et sõnad oleksid eraldi.",
+          "[data-k=space]",
+          { input: "Tere " },
+        ),
+        {
+          type: "info",
+          target: ".kb",
+          show: ".composer",
+          cardAt: "top",
+          text: "Nüüd kirjutame <b>õhtust</b>. Klaviatuuril ei ole eraldi tähti <b>õ, ä, ö, ü</b>. Need saad, kui <b>hoiad sõrme</b> tähe <b>o, a</b> või <b>u</b> peal.",
+        },
+        kb(
+          "<b>Hoia sõrme</b> tähel <b>o</b>, kuni tuleb nähtavale väike aken.",
+          "[data-base=o]",
+          { until: "keyLong" },
+          { hint: "Hoia sõrme o-tähel umbes üks sekund." },
+        ),
+        kb("Vali aknast täht <b>õ</b>.", '.accpop [data-k="ch:õ"]', {
+          input: "Tere õ",
         }),
-        act(
-          "Täht <b>õ</b> peidab end klahvi <b>o</b> taha. <b>Hoia sõrme</b> klahvil <b>o</b>, kuni avaneb valik.",
-          "[data-k=o]",
-          "longKey:o",
+        kb(
+          "Kirjuta edasi: <b>htust</b>.",
+          ".kb",
+          { input: "Tere õhtust" },
           {
-            show: ".composer",
-            cardAt: "top",
-            hint: "Hoia sõrme all umbes üks sekund.",
+            hint: "Vajuta tähti h, t, u, s, t.",
           },
         ),
-        typed(
-          "Vali valikust <b>õ</b> ja kirjuta sõna <b>õhtust</b>.",
-          "Tere õhtust",
-          {
-            hint: "Pärast õ-d vajuta tähti h, t, u, s, t.",
-          },
-        ),
-        act(
+        kb(
           "Kui kirjutasid valesti, saad tähe <b>kustutada</b>. Vajuta klahvi ⌫.",
           "[data-k=bksp]",
-          "bksp",
-          {
-            show: ".composer",
-            cardAt: "top",
-          },
+          { until: "bksp" },
         ),
-        typed("Kirjuta kustutatud täht <b>t</b> tagasi.", "Tere õhtust"),
-        act(
+        kb("Kirjuta kustutatud täht <b>t</b> tagasi.", ".kb", {
+          input: "Tere õhtust",
+        }),
+        kb(
           "Numbrid ja märgid on eraldi klaviatuuril. Vajuta <b>123</b>.",
           "[data-k=mode123]",
-          "mode123",
-          {
-            show: ".composer",
-            cardAt: "top",
-          },
+          { until: "mode123" },
         ),
-        typed("Vajuta <b>hüüumärki !</b>", "Tere õhtust!", {
-          target: '[data-k="ch:!"]',
+        kb("Vajuta <b>hüüumärki !</b>", '[data-k="ch:!"]', {
+          input: "Tere õhtust!",
         }),
         info(
           "Tubli! Kirjutasid „<b>Tere õhtust!</b>”. Tähtede juurde saad tagasi nupuga <b>ABC</b>.",
@@ -171,35 +175,24 @@ export const messages: House = {
         info(
           "See on vestlus <b>Nutirobo</b>ga. Nutirobo on sinu harjutussõber.",
           ".chathead",
-          { enter: "botSay", popup: NUTIROBO_REPLIES[0] },
+          { enter: "botSay:0" },
         ),
         info("Nutirobo saatis sulle sõnumi. Vastame talle!", ".bub.in"),
         act("Vajuta <b>kirjutamiskastile</b>.", ".composer-input", "focus"),
-        act(
+        kb(
           "Kirjuta vastus, näiteks <b>Hästi, aitäh!</b> Siis vajuta <b>saatmisnuppu</b> ➤.",
           ".kb, .send",
-          "sent",
-          {
-            show: ".composer",
-            cardAt: "top",
-            hint: "Kirjuta midagi ja vajuta sinist noolt.",
-          },
+          { until: "sent" },
+          { hint: "Kirjuta midagi ja vajuta sinist noolt." },
         ),
-        act(
-          "Nutirobo küsib: „Kuidas ma sind kutsun?” Kirjuta <b>oma nimi</b> ja saada sõnum.",
+        kb(
+          "Nutirobo küsib, <b>kuidas sind kutsuda</b>. Kirjuta oma nimi või hüüdnimi ja saada sõnum.",
           ".kb, .send",
-          "sent",
-          {
-            show: ".composer",
-            cardAt: "top",
-            enter: "botSay",
-            popup: NUTIROBO_REPLIES[1],
-            hint: "Kirjuta oma nimi ja vajuta sinist noolt.",
-          },
+          { until: "sent" },
+          { enter: "botSay:1", hint: "Kirjuta nimi ja vajuta sinist noolt." },
         ),
         info("Väga hea! Sa saatsid kaks sõnumit ja said vastused.", ".thread", {
-          enter: "botSay",
-          popup: NUTIROBO_REPLIES[2],
+          enter: "botSay:2",
         }),
       ],
     },
@@ -221,7 +214,7 @@ export const messages: House = {
         ),
         act("Vajuta <b>+ nuppu</b>.", ".plus", "attachOpen", { os: "ios" }),
         act(
-          "Vali <b>Heli</b>. Salvestamine algab kohe.",
+          "Vali <b>Audio</b> (heli). Salvestamine algab kohe.",
           "[data-att=audio]",
           "recStart",
           { os: "ios" },
@@ -265,7 +258,7 @@ export const messages: House = {
         ),
         act("Vali üks <b>emotikon</b>.", ".emojigrid", "emojiPick"),
         act("Vajuta <b>saatmisnuppu</b>.", ".send", "sent"),
-        info("Emotikon on saadetud!", ".bub.out:last-of-type"),
+        info("Emotikon on saadetud!", ".thread > .bub.out:last-of-type"),
       ],
     },
     {
@@ -273,21 +266,25 @@ export const messages: House = {
       setup: "chat:mari",
       steps: [
         info(
-          "Sõnumile saad vastata ka <b>reaktsiooniga</b>, näiteks 👍 või ❤️. Nii ei pea sa midagi kirjutama.",
-          ".thread",
+          "Sõnumile saad vastata ka ilma kirjutamata: lisa sellele <b>reaktsioon</b>, näiteks 👍 või ❤️.",
+          ".bub.in",
         ),
         act(
           "<b>Hoia sõrme</b> Mari sõnumil, kuni avaneb menüü.",
           "[data-last-in]",
           "longMsg",
           {
-            hint: "Hoia sõrme all umbes üks sekund.",
+            hint: "Hoia sõrme sõnumil umbes üks sekund.",
           },
         ),
-        act("Vali üks <b>reaktsioon</b>.", ".reactions", "react"),
         info(
-          "Sõnumi juures on nüüd sinu reaktsioon. Mari näeb seda kohe.",
-          "[data-last-in]",
+          "Üleval on <b>reaktsioonid</b>. All on teised valikud, näiteks kopeerimine.",
+          ".reactbar",
+        ),
+        act("Vali üks reaktsioon, näiteks <b>👍</b>.", ".reactbar", "react"),
+        info(
+          "Reaktsioon on lisatud sõnumi külge. Mari näeb, et sa sõnumit lugesid ja sellele reageerisid.",
+          ".bub.in.hasr",
         ),
       ],
     },
@@ -306,21 +303,30 @@ export const messages: House = {
           {
             android:
               "<b>Galerii:</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
-            ios: "<b>Fotod:</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
+            ios: "<b>Photos (fotod):</b> saada telefonis olevaid <b>pilte ja videoid</b>.",
           },
           "[data-att=gallery]",
         ),
         info(
-          "<b>Kaamera:</b> tee uus pilt ja saada see kohe.",
+          "<b>Camera</b> (kaamera): tee uus pilt ja saada see kohe.",
           "[data-att=camera]",
-          { os: "ios" },
+          {
+            os: "ios",
+          },
         ),
         info(
-          "<b>Kontakt:</b> saada kellegi nimi ja telefoninumber.",
+          {
+            android: "<b>Kontakt:</b> saada kellegi nimi ja telefoninumber.",
+            ios: "<b>Contact (kontakt):</b> saada kellegi nimi ja telefoninumber.",
+          },
           "[data-att=contact]",
         ),
         info(
-          "<b>Asukoht:</b> näita kaardil, kus sa praegu oled. Kasulik, kui keegi tuleb sulle järele.",
+          {
+            android:
+              "<b>Asukoht:</b> näita kaardil, kus sa praegu oled. Kasulik, kui keegi tuleb sulle järele.",
+            ios: "<b>Location (asukoht):</b> näita kaardil, kus sa praegu oled. Kasulik, kui keegi tuleb sulle järele.",
+          },
           "[data-att=location]",
         ),
       ],
@@ -341,9 +347,20 @@ export const messages: House = {
             hint: "Hoia sõrme all umbes üks sekund.",
           },
         ),
-        act("Vajuta <b>Kopeeri</b>.", "[data-ctx=copy]", "copy"),
+        act(
+          {
+            android: "Vajuta <b>Kopeeri</b>.",
+            ios: "Vajuta <b>Copy</b> (kopeeri).",
+          },
+          "[data-ctx=copy]",
+          "copy",
+        ),
         info(
-          "Kood on kopeeritud. Kleepimiseks <b>hoia sõrme</b> kastil, kuhu koodi vaja on, ja vali <b>Kleebi</b>.",
+          {
+            android:
+              "Kood on kopeeritud. Kleepimiseks <b>hoia sõrme</b> kastil, kuhu koodi vaja on, ja vali <b>Kleebi</b>.",
+            ios: "Kood on kopeeritud. Kleepimiseks <b>hoia sõrme</b> kastil, kuhu koodi vaja on, ja vali <b>Paste</b>.",
+          },
           ".composer-input",
         ),
         info(
@@ -363,13 +380,16 @@ export const messages: House = {
         act(
           {
             android: "Vajuta üleval <b>prügikasti</b> nupule.",
-            ios: "Vajuta <b>Kustuta</b>.",
+            ios: "Vajuta <b>Delete</b> (kustuta).",
           },
           ".del-btn",
           "delAsk",
         ),
         act(
-          "Telefon küsib üle. Vajuta <b>Kustuta</b>.",
+          {
+            android: "Telefon küsib üle. Vajuta <b>Kustuta</b>.",
+            ios: "Telefon küsib üle. Vajuta <b>Delete</b>.",
+          },
           ".confirm-del",
           "deleted",
           { cardAt: "bottom" },
@@ -396,7 +416,7 @@ export const messages: House = {
         act(
           {
             android: "Vali <b>Blokeeri ja teata rämpspostist</b>.",
-            ios: "Vali <b>Blokeeri see helistaja</b>.",
+            ios: "Vali <b>Block this Caller</b> (blokeeri see helistaja).",
           },
           "[data-menu=block]",
           "blockAsk",
