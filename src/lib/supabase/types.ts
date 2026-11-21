@@ -41,6 +41,27 @@ export type Database = {
         }
         Relationships: []
       }
+      login_failures: {
+        Row: {
+          failed_count: number
+          locked_until: string | null
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          failed_count?: number
+          locked_until?: string | null
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          failed_count?: number
+          locked_until?: string | null
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -62,11 +83,33 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_ips: {
+        Row: {
+          created_at: string
+          id: number
+          ip: unknown
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          ip: unknown
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          ip?: unknown
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      clear_failed_logins: { Args: { p_username: string }; Returns: undefined }
+      is_login_locked: { Args: { p_username: string }; Returns: string }
+      register_failed_login: { Args: { p_username: string }; Returns: string }
+      signups_from_ip_last_hour: { Args: { p_ip: unknown }; Returns: number }
       touch_last_active: { Args: never; Returns: undefined }
     }
     Enums: {
