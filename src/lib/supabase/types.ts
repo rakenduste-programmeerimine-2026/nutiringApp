@@ -107,7 +107,9 @@ export type Database = {
     }
     Functions: {
       clear_failed_logins: { Args: { p_username: string }; Returns: undefined }
+      delete_inactive_accounts: { Args: never; Returns: number }
       is_login_locked: { Args: { p_username: string }; Returns: string }
+      purge_old_signup_ips: { Args: never; Returns: number }
       register_failed_login: { Args: { p_username: string }; Returns: string }
       signups_from_ip_last_hour: { Args: { p_ip: unknown }; Returns: number }
       touch_last_active: { Args: never; Returns: undefined }
