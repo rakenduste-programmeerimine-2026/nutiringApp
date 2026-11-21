@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
 import type { ReactNode } from "react";
 import { OsProvider } from "@/features/os";
 import "./globals.css";
 
-// Nunito is downloaded at build time and served by Next.js itself.
-const nunito = Nunito({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-nunito",
-});
+// The Nunito font is self-hosted: see the @font-face rules in globals.css.
 
 export const metadata: Metadata = {
   title: "Nutiküla – Nutiring",
@@ -18,7 +12,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="et" className={nunito.variable}>
+    <html lang="et">
+      <head>
+        {/* Start loading the main font file right away, before the CSS asks for it. */}
+        <link
+          rel="preload"
+          href="/fonts/nunito-latin.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <OsProvider>{children}</OsProvider>
       </body>
