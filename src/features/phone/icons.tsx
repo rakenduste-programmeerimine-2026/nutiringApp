@@ -308,6 +308,7 @@ export const ShiftIcon = ({ filled, ...props }: IconProps & { filled?: boolean }
     />
   </svg>
 );
-export const BackspaceIcon = icon("BackspaceIcon", <path d="M9 5h11v14H9l-6-7zM12 9l6 6M18 9l-6 6" />, {
+// The X is centred in the key shape (x 10.5–16.5); in the prototype it sat too far right.
+export const BackspaceIcon = icon("BackspaceIcon", <path d="M9 5h11v14H9l-6-7zM10.5 9l6 6M16.5 9l-6 6" />, {
   line: true,
 });

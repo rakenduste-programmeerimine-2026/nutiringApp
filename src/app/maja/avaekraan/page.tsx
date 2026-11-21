@@ -1,135 +1,99 @@
 "use client";
 
-import { useRef, useState, type PointerEvent } from "react";
-import { TopBar } from "@/components/ui";
+import type { House } from "@/content/types";
 import { RequireOs, useOs } from "@/features/os";
+import { LessonHouse, type HouseModule } from "@/features/lessons";
 import {
   AppIcon,
   Keyboard,
   NavBar,
-  PhoneStage,
   StatusBar,
-  accentUnderFinger,
   applyKey,
-  closeAccents,
-  highlightAccent,
   initialKeyboard,
-  openAccents,
-  releaseAccents,
+  t,
   type AppKey,
   type KeyboardState,
 } from "@/features/phone";
 
-/* TEMPORARY preview of the phone shell (#10) so it can be checked in the browser.
-   The real Home screen house replaces this in #12 / #13. The small touch
-   handler below is only for the preview – the lesson engine (#11) does this later
-   with the same helper functions. */
+/* TEMPORARY demo of the lesson engine (#11) on top of the phone shell (#10).
+   The real Home screen house (module + 9 lessons) replaces this in #12 / #13. */
 export default function HomeScreenHousePage() {
   return (
     <RequireOs>
-      <Preview />
+      <Demo />
     </RequireOs>
   );
 }
 
-const APPS: AppKey[] = ["settings", "contacts", "clock", "weather"];
-const HOLD_MS = 550; // how long to hold a letter before the accent popup opens
-
-type Typing = { text: string; kb: KeyboardState };
-
-function Preview() {
+function Demo() {
   const { os } = useOs();
-  // text and keyboard change together, so they live in one state object
-  const [typing, setTyping] = useState<Typing>({ text: "", kb: initialKeyboard(os === "ios") });
-  const pressed = useRef<HTMLElement | null>(null);
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const stopTimer = () => {
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    holdTimer.current = null;
-  };
+  return <LessonHouse house={demoHouse} module={demoModule} os={os!} />;
+}
 
-  // 1. finger down on a key: remember it; letters with accents start the hold timer
-  const down = (e: PointerEvent<HTMLDivElement>) => {
-    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-act]");
-    pressed.current = el;
-    if (!el) return;
-    // keep getting move/up events even when the finger leaves the key
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const base = el.dataset.base;
-    if (base) {
-      holdTimer.current = setTimeout(() => {
-        setTyping((t) => ({ ...t, kb: openAccents(t.kb, base) }));
-      }, HOLD_MS);
+type DemoState = { text: string; kb: KeyboardState; opened: AppKey | null };
+const APPS: AppKey[] = ["settings", "contacts", "clock", "weather"];
+
+const demoModule: HouseModule<DemoState> = {
+  initial: (os) => ({ text: "", kb: initialKeyboard(os === "ios"), opened: null }),
+  act: (s, action, data) => {
+    if (action === "key" && data.k) {
+      const r = applyKey(data.k, s.text, s.kb);
+      return { state: { ...s, text: r.text, kb: r.state } };
     }
-  };
-
-  // 2. finger moves: if the popup is open, highlight the letter under the finger
-  const move = (e: PointerEvent<HTMLDivElement>) => {
-    if (!typing.kb.acc) return;
-    const letter = accentUnderFinger(e.clientX, e.clientY);
-    setTyping((t) => {
-      const kb = highlightAccent(t.kb, letter);
-      return kb === t.kb ? t : { ...t, kb };
-    });
-  };
-
-  // 3. finger lifted: popup open → type the highlighted letter and close; otherwise a normal tap
-  const up = () => {
-    stopTimer();
-    const el = pressed.current;
-    pressed.current = null;
-    if (typing.kb.acc) {
-      setTyping((t) => {
-        const r = releaseAccents(t.text, t.kb);
-        return { text: r.text, kb: r.state };
-      });
-      return;
-    }
-    if (!el) return;
-    if (el.dataset.act === "key" && el.dataset.k) {
-      const k = el.dataset.k;
-      setTyping((t) => {
-        const r = applyKey(k, t.text, t.kb);
-        return { text: r.text, kb: r.state };
-      });
-    } else if (el.dataset.act === "emojiPick" && el.dataset.e) {
-      const emoji = el.dataset.e;
-      setTyping((t) => ({ ...t, text: t.text + emoji }));
-    }
-  };
-
-  // finger interrupted (e.g. the browser took over the gesture): just close the popup
-  const cancel = () => {
-    stopTimer();
-    pressed.current = null;
-    setTyping((t) => ({ ...t, kb: closeAccents(t.kb) }));
-  };
-
-  const screen = (
+    if (action === "emojiPick" && data.e) return { state: { ...s, text: s.text + data.e } };
+    if (action === "open" && data.app) return { state: { ...s, opened: data.app as AppKey }, event: `open:${data.app}` };
+    if (action === "navHome") return { state: { ...s, opened: null }, event: "goHome" };
+    return { state: s };
+  },
+  check: (s, c) => c.kind === "text" && s.text.trim().toLowerCase() === String(c.value),
+  render: (s, os) => (
     <div className={`ph ${os === "android" ? "wall" : "wall-ios"}`}>
-      <StatusBar os={os!} light notifs={["msg", "weather", "call"]} sound />
+      <StatusBar os={os} light notifs={["msg", "weather", "call"]} sound />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, padding: "16px 12px" }}>
         {APPS.map((a) => (
-          <AppIcon key={a} os={os!} app={a} />
+          <AppIcon key={a} os={os} app={a} attrs={{ "data-act": "open" }} />
         ))}
       </div>
-      <div style={{ margin: "0 14px", background: "#fff", borderRadius: 20, padding: "10px 14px", minHeight: 44, fontSize: 17 }}>
-        {typing.text || <span style={{ color: "#777" }}>Proovi klaviatuuri (hoia s, o, a…)</span>}
+      <div className="demo-field" style={{ margin: "0 14px", background: "#fff", borderRadius: 20, padding: "10px 14px", minHeight: 44, fontSize: 17 }}>
+        {s.opened ? `${t(os, "Avatud", "Opened")}: ${s.opened}` : s.text || <span style={{ color: "#777" }}>…</span>}
       </div>
       <div style={{ flex: 1 }} />
-      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={cancel}>
-        <Keyboard state={typing.kb} />
-      </div>
-      <NavBar os={os!} dark />
+      <Keyboard state={s.kb} />
+      <NavBar os={os} dark />
     </div>
-  );
+  ),
+};
 
-  return (
-    <PhoneStage
-      os={os!}
-      top={<TopBar title="Avaekraan – telefoni eelvaade" />}
-      screen={screen}
-      guide={<p style={{ fontWeight: 800 }}>Telefoni raami ja klaviatuuri eelvaade (#10).</p>}
-    />
-  );
-}
+const demoHouse: House = {
+  title: "Avaekraan (proov)",
+  lessons: [
+    {
+      title: "Õppemootori proov",
+      steps: [
+        { type: "info", text: "See on <b>kellaaeg</b>. LOE-kaardil vajuta <b>Edasi →</b>.", target: ".sb-time" },
+        {
+          type: "do",
+          text: { android: "Ava rakendus <b>Seaded</b>.", ios: "Ava rakendus <b>Settings</b> (seaded)." },
+          target: "[data-app=settings]",
+          until: "open:settings",
+          hint: "Vajuta hammasratta ikoonile.",
+        },
+        { type: "info", warn: true, text: "See on <b>OHUMÄRK</b>-kaart (punane). Proovi ka nuppu <b>‹ Tagasi</b>.", target: ".sb-batt" },
+        {
+          type: "do",
+          text: "Kirjuta klaviatuuril sõna <b>tere</b>.",
+          target: ".kb",
+          show: ".demo-field",
+          cardAt: "top",
+          popup: "Harjutus: kirjuta <b>tere</b>",
+          check: { kind: "text", value: "tere" },
+          hint: "Vajuta tähti t, e, r, e.",
+        },
+        { type: "do", os: "android", text: "Vajuta ringi <b>●</b>.", target: ".nav-home", until: "goHome" },
+        { type: "do", os: "ios", text: "Vajuta alumist joont.", target: ".homeind", until: "goHome" },
+        { type: "info", text: "Tubli! Mootor töötab. Pikk vajutus, pühkimine ja lohistamine tulevad sammus b." },
+      ],
+    },
+    { title: "Tulekul tund", soon: true, steps: [] },
+  ],
+};
