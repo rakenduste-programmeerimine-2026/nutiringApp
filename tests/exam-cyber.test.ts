@@ -35,7 +35,7 @@ describe("exam content", () => {
 
   it("teaches the õ long press and no longer has the LKF question", () => {
     const all = JSON.stringify(EXAM);
-    expect(all).toContain("Hoia klahvi „o” pikalt all");
+    expect(all).toContain("Hoia sõrme o-tähel");
     expect(all).not.toContain("LKF");
     expect(all).toContain("Autokaubad24");
   });
@@ -92,5 +92,15 @@ describe("cyber content", () => {
   it("has no Malvi, Kalev or LKF left", () => {
     const all = JSON.stringify([TASK_POOL, CHECKLIST, VICTIM_STEPS]);
     for (const w of ["Malvi", "Kalev", "LKF"]) expect(all).not.toContain(w);
+  });
+});
+
+describe("task questions", () => {
+  it("SMS tasks get a question by position, others have their own", async () => {
+    const { taskQuestion, SCAM_SMS, WEB_TASKS } =
+      await import("@/content/cyber");
+    expect(taskQuestion(SCAM_SMS[0], 0)).toContain("Mulle tuli selline sõnum");
+    expect(taskQuestion(SCAM_SMS[0], 1)).toContain("Nüüd tuli veel üks sõnum");
+    for (const t of WEB_TASKS) expect(taskQuestion(t, 2)).toBe(t.question);
   });
 });

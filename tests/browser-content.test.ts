@@ -74,9 +74,8 @@ describe("browser lesson events", () => {
       "pin2Ok",
       "allow",
       "adClose",
-      "paymentCancel",
-      "notifOff",
-      "open:settings",
+      "fgSk",
+      "fgGo",
     ]);
     for (const l of browser.lessons)
       for (const s of l.steps)
