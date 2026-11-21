@@ -24,6 +24,8 @@ export type RunState<S> = {
   snaps: (S | undefined)[];
   /** Show the friendly hint on the card. */
   hint: boolean;
+  /** Gesture-specific hint (e.g. "hold longer") used when the step has no own hint. */
+  hintFallback?: string;
   /** Step is done and the engine is about to move on – ignore input. */
   pending: boolean;
 };
@@ -99,7 +101,16 @@ export function useLessonRunner<S>(house: House, module: HouseModule<S>, os: OS)
     let effects: Effect<S>[] | undefined;
     if (step.enter && module.enter) ({ state: phone, effects } = module.enter(phone, step.enter, os));
 
-    const shown: RunState<S> = { ...r, mode: "run", step: i, phone, snaps, hint: false, pending: false };
+    const shown: RunState<S> = {
+      ...r,
+      mode: "run",
+      step: i,
+      phone,
+      snaps,
+      hint: false,
+      hintFallback: undefined,
+      pending: false,
+    };
     commit(shown);
     schedule(effects);
 
@@ -135,14 +146,21 @@ export function useLessonRunner<S>(house: House, module: HouseModule<S>, os: OS)
     showStep({ mode: "run", lesson: index, step: 0, phone, snaps: [], hint: false, pending: false }, 0);
   }
 
-  /** The user did something on the phone (already allowed by the gesture code). */
-  function act(action: string, data: ActData = {}) {
+  /**
+   * The user did something on the phone (already allowed by the gesture code).
+   * opts.quiet – only update the phone, don't check if the step is done
+   *              (e.g. while a slider is still being dragged).
+   * opts.force – also while the engine is about to move on (pending), e.g. a
+   *              finger lifted from the accent popup must still close it.
+   */
+  function act(action: string, data: ActData = {}, opts: { quiet?: boolean; force?: boolean } = {}) {
     const r = get();
-    if (r.mode !== "run" || r.pending) return;
+    if (r.mode !== "run" || (r.pending && !opts.force)) return;
     const res = module.act(r.phone, action, data, os);
     const after: RunState<S> = { ...r, phone: res.state };
     commit(after);
     schedule(res.effects);
+    if (opts.quiet || r.pending) return;
 
     const step = lessonOf(r).steps[r.step];
     if (matchesUntil(step, action) || matchesUntil(step, res.event)) {
@@ -154,11 +172,16 @@ export function useLessonRunner<S>(house: House, module: HouseModule<S>, os: OS)
     }
   }
 
-  /** Wrong place tapped on a "do" step: show the friendly hint. */
-  function showHint() {
+  /**
+   * Wrong touch on a "do" step: show the friendly hint. `fallback` is a
+   * gesture-specific text (e.g. "hold longer") used if the step has no own hint.
+   */
+  function showHint(fallback?: string) {
     const r = get();
     const step = r.mode === "run" ? lessonOf(r).steps[r.step] : undefined;
-    if (step?.type === "do" && !r.pending && !r.hint) commit({ ...r, hint: true });
+    if (step?.type !== "do" || r.pending) return;
+    if (r.hint && r.hintFallback === fallback) return;
+    commit({ ...r, hint: true, hintFallback: fallback });
   }
 
   function showList() {

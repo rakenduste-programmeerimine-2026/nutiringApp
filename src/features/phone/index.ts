@@ -11,6 +11,7 @@ export {
   closeAccents,
   releaseAccents,
   accentUnderFinger,
+  keyboardAction,
   initialKeyboard,
   ACCENTS,
   EMOJIS,

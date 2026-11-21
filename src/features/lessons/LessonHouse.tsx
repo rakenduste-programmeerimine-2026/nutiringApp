@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import type { House, OS } from "@/content/types";
 import { Button, ListIcon, TopBar } from "@/components/ui";
 import { PhoneStage } from "@/features/phone";
-import { usePhoneGestures } from "./gestures";
+import { physicalKey, usePhoneGestures } from "./gestures";
 import { cardPosition, highlightFrame, unionBox, type Box } from "./placement";
 import { resolveText, stepNumber } from "./steps";
 import { CodePopup, StepCard, stepKind } from "./StepCard";
@@ -61,6 +61,26 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
     isAllowed,
     onBlocked: runner.showHint,
     onAct: runner.act,
+    expects: () => step?.until,
+  });
+
+  /* ---------- typing with the computer keyboard (desktop) ----------
+     Only when the on-screen keyboard is open and the step points at it. */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (run.mode !== "run" || run.pending || step?.type !== "do") return;
+      if (!module.keyboardOpen?.(run.phone)) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return; // keep browser shortcuts working
+      const kb = screenRef.current?.querySelector(".kb");
+      const targets = findAll(screenRef.current, targetSelector);
+      if (!kb || !targets.some((t) => t === kb || t.contains(kb) || kb.contains(t))) return;
+      const k = physicalKey(e.key);
+      if (!k) return;
+      e.preventDefault();
+      runner.act("key", { act: "key", k });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   });
 
   /* ---------- highlight frame + card position ---------- */
@@ -115,6 +135,7 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
         n={number.n}
         total={number.total}
         hint={run.hint}
+        hintFallback={run.hintFallback}
         canGoBack={runner.canGoBack}
         onNext={runner.next}
         onBack={runner.back}

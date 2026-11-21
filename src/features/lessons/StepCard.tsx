@@ -24,6 +24,8 @@ type StepCardProps = {
   n: number;
   total: number;
   hint: boolean;
+  /** Gesture-specific hint when the step has none (e.g. "hold longer"). */
+  hintFallback?: string;
   canGoBack: boolean;
   onNext: () => void;
   onBack: () => void;
@@ -40,7 +42,8 @@ export function StepCard(p: StepCardProps) {
   const kind = stepKind(p.step);
   const { icon: Icon, label } = BADGE[kind];
   const popup = resolveText(p.step.popup, p.os);
-  const hint = resolveText(p.step.hint, p.os) || DEFAULT_HINT;
+  // the lesson's own hint wins, then the gesture's hint, then the general one
+  const hint = resolveText(p.step.hint, p.os) || p.hintFallback || DEFAULT_HINT;
 
   return (
     <div
