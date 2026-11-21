@@ -89,7 +89,9 @@
 .phone.ios .ph {
   font-family: -apple-system, "SF Pro Text", "Nunito", system-ui, sans-serif;
 }
-.phone button {
+/* Only the replica's own buttons (inside the screen) – NOT the guide card,
+   which floats in .phlayer on phones and has its own button colours. */
+.phscreen button {
   font: inherit;
   color: inherit;
 }

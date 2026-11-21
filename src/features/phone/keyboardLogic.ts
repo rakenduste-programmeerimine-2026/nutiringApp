@@ -113,6 +113,38 @@ export function releaseAccents(text: string, state: KeyboardState): { text: stri
 }
 
 /**
+ * One place for every keyboard action the lesson engine sends, so each house
+ * only needs:  const r = keyboardAction(action, data, text, kb); if (r) …
+ *   "key"           data.k = key id        → applyKey
+ *   "keyLong"       data.base = "o"        → open accent popup
+ *   "accentHover"   data.letter = "õ" / "" → highlight letter under the finger
+ *   "accentRelease"                        → type highlighted letter, close popup
+ *   "emojiPick"     data.e = "👍"          → add the emoji
+ * Returns null for actions that are not keyboard actions.
+ */
+export function keyboardAction(
+  action: string,
+  data: Record<string, string | undefined>,
+  text: string,
+  state: KeyboardState,
+): { text: string; state: KeyboardState } | null {
+  switch (action) {
+    case "key":
+      return data.k ? applyKey(data.k, text, state) : { text, state };
+    case "keyLong":
+      return { text, state: data.base ? openAccents(state, data.base) : state };
+    case "accentHover":
+      return { text, state: highlightAccent(state, data.letter || null) };
+    case "accentRelease":
+      return releaseAccents(text, state);
+    case "emojiPick":
+      return { text: data.e ? text + data.e : text, state };
+    default:
+      return null;
+  }
+}
+
+/**
  * Which accent letter is under the finger at screen point (x, y)?
  * Returns the letter (e.g. "õ") or null. Uses the browser's elementFromPoint.
  */
