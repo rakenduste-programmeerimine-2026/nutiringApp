@@ -17,7 +17,7 @@ Each person owns their area; only the owner edits these files. Others may import
 
 | Owner | Area | Folders / files |
 |---|---|---|
-| Anette (`aruorg`) | Foundation, phone replica, lesson engine, Home screen + Messages houses, QA | `src/app/layout.tsx`, global styles, `src/app/page.tsx`, `src/app/kula/`, `src/app/maja/avaekraan/`, `src/app/maja/sonumid/`, `src/components/ui/`, `src/features/phone/`, `src/features/lessons/`, `src/features/home/`, `src/features/messages/` |
+| Anette (`aruorg`) | Foundation, phone replica, lesson engine, Home screen + Messages houses, QA | `src/app/layout.tsx`, global styles, `src/app/page.tsx`, `src/app/kula/`, `src/app/maja/avaekraan/`, `src/app/maja/sonumid/`, `src/components/ui/`, `src/features/os/` (Android/iPhone choice: `OsProvider`, `useOs`, `RequireOs` – everyone may use it), `src/features/phone/`, `src/features/lessons/`, `src/features/home/`, `src/features/messages/` |
 | Martin (`Shargathx`) | All content data, auth, the whole Exam | `src/content/` (incl. shared `types.ts`), `src/app/eksam/`, `src/features/exam/`, `src/lib/auth/`, `middleware.ts` |
 | Roland (`piperal`) | Database, the whole Cyber security house (Tiia + Küberbrauser) | `supabase/migrations/`, `src/lib/supabase/types.ts`, `src/app/maja/kuber/`, `src/features/cyber/`, `src/features/browser/` |
 
