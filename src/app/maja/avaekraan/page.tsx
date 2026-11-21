@@ -187,6 +187,8 @@ function DemoShade({ os, open, pull }: { os: "android" | "ios"; open: boolean; p
 
 const demoHouse: House = {
   title: "Avaekraan (proov)",
+  intro:
+    "<h3>Õppemootori proov</h3><p>See on <b>ajutine</b> proovimaja. Siin saad järele proovida kõik kaardid, žestid ja lõpulehed.</p><p>Päris avaekraani tunnid tulevad siia peagi.</p>",
   lessons: [
     {
       title: "Õppemootori proov",
@@ -230,6 +232,15 @@ const demoHouse: House = {
         { type: "do", os: "ios", text: "<b>Pühi alumisest joonest üles</b> (või vajuta joonele).", target: ".homeind", until: "goHome" },
         { type: "info", text: "Tubli! Kõik žestid töötavad." },
       ],
+    },
+    {
+      title: "Kokkuvõtte proov",
+      summary: [
+        "Kokkuvõttelehel on tunni <b>peamised punktid</b>.",
+        "All on koht kliendi <b>lisapunktidele</b>.",
+        "Järgmine tund on „Tulekul”, seega nuppu <b>Järgmine õppetund</b> siin ei ole.",
+      ],
+      steps: [{ type: "info", text: "Selle tunni lõpus näed lehte <b>Peamised punktid</b>." }],
     },
     { title: "Tulekul tund", soon: true, steps: [] },
   ],

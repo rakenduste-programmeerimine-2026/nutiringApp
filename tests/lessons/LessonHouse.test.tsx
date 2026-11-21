@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { vi } from "vitest";
 import type { House } from "@/content/types";
@@ -66,7 +66,8 @@ afterEach(() => vi.useRealTimers());
 describe("lesson engine", () => {
   it("starts from the lesson list; the „Tulekul” lesson is disabled", () => {
     render(<LessonHouse house={house} module={fakeModule} os="ios" />);
-    expect(screen.getByRole("button", { name: "3. Tulekul tund" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "3. Tulekul tund (tulekul)" })).toBeDisabled();
+    expect(screen.getByText("Tulekul")).toBeInTheDocument();
   });
 
   it("LOE step: shows the text with formatting and moves on with „Edasi →”", () => {
@@ -150,5 +151,74 @@ describe("lesson engine", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
     fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
     expect(screen.getByText("Tubli!")).toBeInTheDocument();
+    expect(screen.getByText("Õppetund „Teine tund” on läbi.")).toBeInTheDocument();
+  });
+});
+
+describe("screens around the lessons", () => {
+  const finish = (lesson: string, steps: number) => {
+    start("ios", lesson);
+    for (let i = 0; i < steps; i++) fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+  };
+
+  it("end screen: „Järgmine õppetund” starts the next lesson; links back to the village", () => {
+    render(<LessonHouse house={house} module={fakeModule} os="ios" />);
+    fireEvent.click(screen.getByRole("button", { name: "1. Esimene tund" }));
+    // jump straight to the second lesson's end via the list instead of playing lesson 1
+    fireEvent.click(screen.getByRole("button", { name: "Õppetunnid" }));
+    fireEvent.click(screen.getByRole("button", { name: "2. Teine tund" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+    // next lesson is „Tulekul” → no „Järgmine õppetund”
+    expect(screen.queryByRole("button", { name: "Järgmine õppetund →" })).toBeNull();
+    // two links: the top bar and the end screen – both go to the village
+    const links = screen.getAllByRole("link", { name: "Tagasi külasse" });
+    expect(links).toHaveLength(2);
+    links.forEach((l) => expect(l).toHaveAttribute("href", "/kula"));
+    fireEvent.click(screen.getByRole("button", { name: "Vali teine õppetund" }));
+    expect(screen.getByText("Vali õppetund")).toBeInTheDocument();
+  });
+
+  it("„Järgmine õppetund →” is shown when the next lesson can be started", () => {
+    const twoLessons: House = { title: "Kaks", lessons: [house.lessons[1], { title: "Kolmas", steps: [{ type: "info", text: "Kolm" }] }] };
+    render(<LessonHouse house={twoLessons} module={fakeModule} os="ios" />);
+    fireEvent.click(screen.getByRole("button", { name: "1. Teine tund" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+    fireEvent.click(screen.getByRole("button", { name: "Järgmine õppetund →" }));
+    expect(card()).toHaveTextContent("Kolm");
+  });
+
+  it("a lesson with a summary ends with „Peamised punktid”", () => {
+    const withSummary: House = {
+      title: "Kokkuvõte",
+      lessons: [{ title: "Tund", summary: ["Vaata <b>aadressi</b>.", "Ära sisesta PIN2."], steps: [{ type: "info", text: "Üks" }] }],
+    };
+    render(<LessonHouse house={withSummary} module={fakeModule} os="ios" />);
+    fireEvent.click(screen.getByRole("button", { name: "1. Tund" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edasi →" }));
+    expect(screen.getByText("Peamised punktid")).toBeInTheDocument();
+    expect(screen.getByText("aadressi").tagName).toBe("B");
+    expect(screen.getByText("Lisapunktid")).toBeInTheDocument();
+    expect(screen.queryByText("Tubli!")).toBeNull();
+  });
+
+  it("a house with an intro shows it first, then the list", () => {
+    const withIntro: House = { ...house, intro: "<h3>Küberbrauser</h3><p>See ei ole päris brauser.</p>" };
+    render(<LessonHouse house={withIntro} module={fakeModule} os="ios" />);
+    expect(screen.getByRole("heading", { name: "Küberbrauser" })).toBeInTheDocument();
+    expect(screen.queryByText("Vali õppetund")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Sain aru, alustan" }));
+    expect(screen.getByText("Vali õppetund")).toBeInTheDocument();
+  });
+
+  it("the legend explains OHUMÄRK only in houses that use red cards", () => {
+    finish("1. Esimene tund", 0);
+    expect(screen.getByText(/Punane kaart „OHUMÄRK”/)).toBeInTheDocument();
+    cleanup();
+    const noWarn: House = { title: "Ilma", lessons: [house.lessons[1]] };
+    render(<LessonHouse house={noWarn} module={fakeModule} os="ios" />);
+    expect(screen.queryByText(/Punane kaart „OHUMÄRK”/)).toBeNull();
+    expect(screen.getByText(/„Tagasi” viib ühe sammu tagasi/)).toBeInTheDocument();
   });
 });

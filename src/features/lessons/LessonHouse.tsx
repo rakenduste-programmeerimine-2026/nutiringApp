@@ -8,6 +8,7 @@ import { physicalKey, usePhoneGestures } from "./gestures";
 import { cardPosition, highlightFrame, unionBox, type Box } from "./placement";
 import { resolveText, stepNumber } from "./steps";
 import { CodePopup, StepCard, stepKind } from "./StepCard";
+import { DoneScreen, IntroScreen, Legend, LessonList } from "./Screens";
 import type { HouseModule } from "./types";
 import { useLessonRunner } from "./useLessonRunner";
 import { useWide } from "./useWide";
@@ -145,30 +146,29 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
       />
     );
 
-  // TEMPORARY simple list and end screen – the real ones come in step c
+  const nextLesson = house.lessons[run.lesson + 1];
   const overlay =
-    run.mode === "list" || run.mode === "intro" ? (
-      <div className={styles.ovl}>
-        <div className={styles.panel}>
-          <h3>Vali õppetund</h3>
-          {house.lessons.map((l, i) => (
-            <Button key={l.title} variant="ghost" small block disabled={l.soon} onClick={() => runner.startLesson(i)}>
-              {i + 1}. {l.title}
-            </Button>
-          ))}
-        </div>
-      </div>
-    ) : run.mode === "done" ? (
-      <div className={styles.ovl}>
-        <div className={styles.panel}>
-          <h3>Tubli!</h3>
-          <p>Õppetund „{lesson?.title}” on läbi.</p>
-          <Button block onClick={runner.showList}>
-            Vali teine õppetund
-          </Button>
-        </div>
-      </div>
+    run.mode === "intro" && house.intro ? (
+      <IntroScreen text={house.intro} onContinue={runner.showList} />
+    ) : run.mode === "list" || run.mode === "intro" ? (
+      <LessonList house={house} onStart={runner.startLesson} />
+    ) : run.mode === "done" && lesson ? (
+      <DoneScreen
+        lesson={lesson}
+        hasNext={!!nextLesson && !nextLesson.soon}
+        onNext={() => runner.startLesson(run.lesson + 1)}
+        onList={runner.showList}
+      />
     ) : null;
+
+  // red OHUMÄRK cards are only explained in houses that use them
+  const usesWarn = house.lessons.some((l) => l.steps.some((s) => s.warn));
+  const guideMessage =
+    run.mode === "intro"
+      ? "Loe telefoni ekraanilt, mis see koht on."
+      : run.mode === "done"
+        ? "Õppetund on läbi. Vali, mida edasi teha."
+        : "Vali õppetund telefoni ekraanilt.";
 
   const layer = (
     <>
@@ -189,11 +189,13 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
         <div className={styles.gtitle}>Õppetund {run.lesson + 1}</div>
         <div className={styles.gh}>{lesson.title}</div>
         {wide && card(true)}
+        <Legend withWarn={usesWarn} />
       </>
     ) : (
       <>
         <div className={styles.gtitle}>{house.title}</div>
-        <div className={styles.gh}>Vali õppetund telefoni ekraanilt.</div>
+        <div className={styles.gh}>{guideMessage}</div>
+        <Legend withWarn={usesWarn} />
       </>
     );
 
@@ -202,7 +204,8 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
       {run.mode === "run" && (
         <Button variant="ghost" small onClick={runner.showList} aria-label="Õppetunnid">
           <ListIcon />
-          Õppetunnid
+          <span className={styles.long}>Õppetunnid</span>
+          <span className={styles.short}>Tunnid</span>
         </Button>
       )}
     </TopBar>
