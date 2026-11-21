@@ -9,6 +9,15 @@ import {
   type AuthResult,
 } from "@/lib/auth/flows";
 import { createClient } from "@/lib/supabase/server";
+import { MESSAGES } from "@/lib/auth/validation";
+import {
+  computeScore,
+  isOS,
+  isTopic,
+  latestPerTopic,
+} from "@/features/exam/score";
+
+const NOT_LOGGED_IN = "Tulemuse salvestamiseks pead olema sisse logitud.";
 
 export async function register(
   username: string,
@@ -110,4 +119,51 @@ export async function login(
 export async function logout(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
+}
+
+// ---------------------------------------------------------------------------
+// Exam results (#7)
+// ---------------------------------------------------------------------------
+
+export async function saveExamResult(input: {
+  topic: "home" | "messages" | "cyber";
+  os: "android" | "ios";
+  answers: number[];
+}): Promise<{ ok: true; score: number } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: NOT_LOGGED_IN };
+
+  const { topic, os, answers } = input ?? {};
+  if (!isTopic(topic) || !isOS(os))
+    return { ok: false, error: MESSAGES.generic };
+
+  // The score is always computed here from the answers; the client never sends one.
+  const score = computeScore(topic, answers);
+  if (score === null) return { ok: false, error: MESSAGES.generic };
+
+  const { error } = await supabase
+    .from("exam_results")
+    .insert({ user_id: user.id, topic, os, score });
+  if (error) return { ok: false, error: MESSAGES.generic };
+  return { ok: true, score };
+}
+
+export async function getMyResults(): Promise<
+  { topic: string; score: number; created_at: string }[]
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // RLS already limits rows to the caller's own.
+  const { data } = await supabase
+    .from("exam_results")
+    .select("topic, score, created_at")
+    .order("created_at", { ascending: false });
+  return latestPerTopic(data ?? []);
 }
