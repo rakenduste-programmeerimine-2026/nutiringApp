@@ -1,0 +1,30 @@
+/* Prototype class .logo – "Nuti" + a ring with "ring" inside.
+   Size it by setting font-size on the parent or via className. */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 900;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+}
+
+.ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.075em solid currentColor;
+  border-radius: 50%;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 0.06em;
+  letter-spacing: 0;
+  flex: none;
+}
+
+.ring span {
+  font-size: 0.36em;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: -0.08em;
+}

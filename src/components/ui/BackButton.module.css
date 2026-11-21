@@ -1,0 +1,40 @@
+/* Prototype class .backbtn */
+.backbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 18px 8px 12px;
+  border: 3px solid var(--navy);
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 19px;
+  color: var(--navy);
+  background: #fff;
+  text-decoration: none;
+  flex: none;
+}
+
+.backbtn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Short label "Küla" is shown only on phones */
+.short {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .backbtn {
+    min-height: 48px;
+    font-size: 17px;
+    padding: 6px 14px 6px 10px;
+  }
+  .long {
+    display: none;
+  }
+  .short {
+    display: inline;
+  }
+}

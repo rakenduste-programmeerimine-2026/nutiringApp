@@ -1,0 +1,43 @@
+/* Prototype classes .btn, .btn.ghost, .btn.block, .btn.small */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 22px;
+  background: var(--navy);
+  color: #fff;
+  border: 3px solid var(--navy);
+  text-decoration: none;
+  transition: transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn svg {
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.ghost {
+  background: #fff;
+  color: var(--navy);
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+.small {
+  min-height: 52px;
+  font-size: 19px;
+  padding: 10px 20px;
+}
