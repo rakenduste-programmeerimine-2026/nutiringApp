@@ -1,13 +1,52 @@
-import { Fragment, type ReactNode } from "react";
+"use client";
+
+import { createContext, Fragment, useContext, useEffect, useRef, type ReactNode } from "react";
 import styles from "./cyber.module.css";
 
 /*
  * Message texts in src/content/cyber.ts mark warning signs as [[n|text]].
  * SignText shows such a text as React elements (never as raw HTML):
- *   - each marker becomes <span data-s="n"> so the answer flow (#17) can highlight sign n
+ *   - each marker becomes <span data-s="n">, highlighted once the answer flow reaches sign n
  *   - web addresses are shown blue and underlined, like links in a phone
  *   - line breaks are kept
  */
+
+/** How a sign marker looks right now. */
+export type SignMark = {
+  /** green (a sign of a real message) instead of red */
+  ok: boolean;
+  /** the sign being explained at the moment */
+  current: boolean;
+};
+
+/** Which markers to highlight: ref → mark. Empty while Tiia is still asking. */
+export const SignMarksContext = createContext<ReadonlyMap<number, SignMark>>(new Map());
+
+/** One marked part of a text. */
+export function Sig({ sign, children }: { sign: number; children: ReactNode }) {
+  const mark = useContext(SignMarksContext).get(sign);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isCurrent = mark?.current ?? false;
+
+  // Bring the sign being explained into view.
+  useEffect(() => {
+    if (isCurrent) ref.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+  }, [isCurrent]);
+
+  const classes = [
+    styles.sig,
+    mark && styles.shown,
+    mark?.ok && styles.ok,
+    mark?.current && styles.current,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return (
+    <span ref={ref} className={classes} data-s={sign} data-mark={mark ? (mark.ok ? "ok" : "bad") : undefined}>
+      {children}
+    </span>
+  );
+}
 
 const MARKER = /\[\[(\d+)\|([\s\S]*?)\]\]/g;
 const URL = /((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:ee|cc|com|info|top|xyz|id)(?:\/[^\s]*)?)/gi;
@@ -72,9 +111,9 @@ export function SignText({ text, links = false }: SignTextProps) {
         part.sign === undefined ? (
           <Fragment key={i}>{withLinks(part.text, links)}</Fragment>
         ) : (
-          <span key={i} className={styles.sig} data-s={part.sign}>
+          <Sig key={i} sign={part.sign}>
             {withLinks(part.text, links)}
-          </span>
+          </Sig>
         ),
       )}
     </>

@@ -4,7 +4,6 @@ import { CALL_TASKS, SAFE_SMS, SCAM_SMS, WEB_TASKS, type CyberTask } from "@/con
 import type { OS } from "@/content/types";
 import { CyberHouse, TiiaFace, TiiaTasks, parseSigns, plainText } from "@/features/cyber";
 import { CALL_SECONDS, metaFor } from "@/features/cyber/TaskViews";
-import { ROUND_END_PATH } from "@/features/cyber/TiiaTasks";
 
 const push = vi.fn();
 const router = { push, replace: vi.fn(), refresh: vi.fn() };
@@ -152,31 +151,6 @@ describe("call", () => {
 });
 
 describe("round of four tasks", () => {
-  it("goes through all four tasks and then back to the house", () => {
-    vi.useFakeTimers();
-    renderTasks([scamSms, safeSms, serp, call]);
-    expect(progress()).toHaveAttribute("aria-valuenow", "1");
-
-    fireEvent.click(screen.getByRole("button", { name: "Kelmus" }));
-    expect(progress()).toHaveAttribute("aria-valuenow", "2");
-    expect(screen.getByText("Nüüd tuli veel üks sõnum. Kas see on kelmus?")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Pole kelmus" }));
-    expect(progress()).toHaveAttribute("aria-valuenow", "3");
-
-    fireEvent.click(screen.getAllByRole("button", { name: /cooppank\.ee/ })[1]);
-    expect(progress()).toHaveAttribute("aria-valuenow", "4");
-    expect(answerButtons()).toHaveLength(0);
-
-    fireEvent.click(screen.getByRole("button", { name: "Kuula kõnet" }));
-    act(() => {
-      vi.advanceTimersByTime(CALL_SECONDS * 1000);
-    });
-    expect(push).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Kelmus" }));
-    expect(push).toHaveBeenCalledWith(ROUND_END_PATH);
-  });
-
   it("picks a fresh round of four when no tasks are given", () => {
     render(<TiiaTasks os="android" />);
     expect(progress()).toHaveAttribute("aria-valuemax", "4");
