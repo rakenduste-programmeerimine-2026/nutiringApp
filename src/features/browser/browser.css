@@ -1,0 +1,801 @@
+/* Küberbrauser practice browser (prototype classes .br, .res, .fakegov, .perm, .adpop, .spam, .skapp …).
+   Global class names because the lessons point at them; everything is scoped to .phone .brph
+   so the names cannot clash with the other houses. */
+
+.phone .brph {
+  background: #fff;
+}
+
+.phone .brph button {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---------- browser frame ---------- */
+
+.phone .brph .br {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  font-family: system-ui, Arial, sans-serif;
+}
+
+.phone .brph .br-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #f1f3f7;
+  border-bottom: 1px solid #dde2ec;
+}
+
+.phone .brph .br-badge {
+  background: #c62828;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  padding: 3px 6px;
+  border-radius: 6px;
+  flex: none;
+}
+
+.phone .brph .br-url {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 7px 10px;
+  font-size: 13.5px;
+  color: #111;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.phone .brph .br-url svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: #555;
+}
+
+.phone .brph .br-url > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phone .brph .u-dim {
+  color: #777;
+}
+
+.phone .brph .br-page {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: #fff;
+}
+
+.phone .brph .br-bot {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 4px 8px;
+  background: #f1f3f7;
+  border-top: 1px solid #dde2ec;
+  flex: none;
+}
+
+.phone .brph .br-bot button {
+  width: 48px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 26px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+.phone .brph .br-bot svg {
+  width: 22px;
+  height: 22px;
+}
+
+.phone .brph .br-bot .br-tabs {
+  font-size: 14px;
+  font-weight: 800;
+  border: 2px solid #333;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+
+/* ---------- start page and search ---------- */
+
+.phone .brph .br-home-pg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 50px 16px 16px;
+}
+
+.phone .brph .br-home-pg.br-typing {
+  padding-top: 16px;
+}
+
+.phone .brph .br-logo {
+  font-size: 30px;
+  font-weight: 300;
+  color: #03236a;
+}
+
+.phone .brph .br-logo b {
+  font-weight: 900;
+}
+
+.phone .brph .br-search {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #d0d7e6;
+  border-radius: 24px;
+  padding: 11px 14px;
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+}
+
+.phone .brph .br-search.on {
+  border-color: #5984e7;
+  color: #111;
+}
+
+.phone .brph .br-search svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.phone .brph .caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: #1a73e8;
+  vertical-align: middle;
+  animation: br-blink 1s step-end infinite;
+  margin-left: -9px;
+}
+
+@keyframes br-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.phone .brph .sugg {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #eef2fb;
+  font-size: 16px;
+  text-align: left;
+  color: #111;
+}
+
+.phone .brph .sugg svg {
+  width: 16px;
+  height: 16px;
+  color: #777;
+  flex: none;
+}
+
+/* ---------- search results ---------- */
+
+.phone .brph .results {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.phone .brph .res {
+  display: block;
+  text-align: left;
+  border: 1px solid #e3e3e3;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.phone .brph .res .sp {
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.phone .brph .res .url {
+  font-size: 12.5px;
+  color: #202124;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.phone .brph .res .tt {
+  font-size: 16.5px;
+  color: #1a0dab;
+  margin-top: 4px;
+}
+
+.phone .brph .res .ds {
+  font-size: 13px;
+  color: #4d5156;
+  margin-top: 2px;
+}
+
+/* ---------- fake government site ---------- */
+
+.phone .brph .fakegov {
+  font-family: Arial, sans-serif;
+}
+
+.phone .brph .fg-head {
+  background: #1f3a68;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.phone .brph .fg-emb {
+  width: 26px;
+  height: 26px;
+  display: flex;
+}
+
+.phone .brph .fg-emb svg {
+  width: 100%;
+  height: 100%;
+}
+
+.phone .brph .fg-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #222;
+}
+
+.phone .brph .fg-body h4 {
+  font-size: 22px;
+  color: #1f3a68;
+}
+
+.phone .brph .fg-body p {
+  font-size: 15px;
+}
+
+.phone .brph .fg-btn {
+  background: #1f3a68;
+  color: #fff;
+  border-radius: 6px;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.phone .brph .fg-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.phone .brph .fg-m {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #c9d1e0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  background: #fff;
+}
+
+.phone .brph .skdot {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #6b3fa0;
+  color: #fff;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex: none;
+}
+
+.phone .brph .skdot.big {
+  width: 40px;
+  height: 40px;
+  font-size: 22px;
+  border-radius: 12px;
+  background: #fff;
+  color: #6b3fa0;
+}
+
+.phone .brph .fg-lbl {
+  font-size: 13px;
+  color: #555;
+}
+
+.phone .brph .fg-field {
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 16px;
+  background: #fafafa;
+}
+
+.phone .brph .fg-field small {
+  color: #888;
+}
+
+.phone .brph .fg-code {
+  background: #f2f5fb;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.phone .brph .fg-code b {
+  display: block;
+  font-size: 40px;
+  letter-spacing: 0.12em;
+  color: #111;
+}
+
+.phone .brph .fg-pin2,
+.phone .brph .fg-done {
+  background: #fff7d6;
+  border: 1px solid #e7c95a;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.phone .brph .fg-done {
+  background: #e5f6ec;
+  border-color: #7fc79a;
+}
+
+/* ---------- recipe and diet pages ---------- */
+
+.phone .brph .cakepg {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #222;
+}
+
+.phone .brph .cp-img {
+  height: 130px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffd6a5, #f4a261);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 48px;
+}
+
+.phone .brph .cakepg h4 {
+  font-size: 21px;
+}
+
+.phone .brph .cakepg p {
+  font-size: 14px;
+}
+
+.phone .brph .cp-ad {
+  height: 60px;
+  border-radius: 8px;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.phone .brph .dietpg {
+  min-height: 100%;
+  background: repeating-linear-gradient(45deg, #fff0f5, #fff0f5 12px, #ffe1ec 12px, #ffe1ec 24px);
+  padding: 16px;
+}
+
+.phone .brph .dp-h {
+  font-size: 26px;
+  font-weight: 900;
+  color: #d6005c;
+}
+
+.phone .brph .dp-b {
+  font-size: 15px;
+  color: #333;
+  margin-top: 6px;
+}
+
+/* ---------- permission prompt and pop-up ads ---------- */
+
+.phone .brph .perm {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+  padding: 14px;
+  z-index: 8;
+  color: #111;
+}
+
+.phone .brph .pm-t {
+  font-size: 14px;
+  color: #444;
+}
+
+.phone .brph .pm-q {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  margin: 8px 0 12px;
+}
+
+.phone .brph .pm-q svg {
+  width: 20px;
+  height: 20px;
+}
+
+.phone .brph .pm-a {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.phone .brph .pm-a button {
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #0b57d0;
+}
+
+.phone .brph .pm-a .perm-allow {
+  background: #0b57d0;
+  color: #fff;
+}
+
+.phone .brph .adwrap {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9;
+}
+
+.phone .brph .adpop {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.phone .brph .adpop.prize {
+  background: linear-gradient(160deg, #ff3d77, #ff9a3d);
+}
+
+.phone .brph .adpop.diet {
+  background: linear-gradient(160deg, #00b36b, #008f99);
+}
+
+/* The tiny ✕ is meant to be missed. */
+.phone .brph .ad-x {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-size: 9px;
+  opacity: 0.75;
+  color: #fff;
+}
+
+.phone .brph .ad-big {
+  font-size: 46px;
+}
+
+.phone .brph .ad-t {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.phone .brph .ad-s {
+  font-size: 14px;
+}
+
+.phone .brph .ad-btn {
+  background: #fff;
+  color: #d6005c;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: 10px;
+  margin-top: 6px;
+}
+
+.phone .brph .adpop.diet .ad-btn {
+  color: #008f99;
+}
+
+/* ---------- notifications ---------- */
+
+.phone .brph .spam {
+  position: absolute;
+  top: 36px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 20;
+}
+
+.phone .brph .spn,
+.phone .brph .sk-notif {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  color: #111;
+  animation: br-drop 0.3s ease;
+}
+
+@keyframes br-drop {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+.phone .brph .sk-notif {
+  position: absolute;
+  top: 36px;
+  left: 8px;
+  right: 8px;
+  z-index: 21;
+  cursor: pointer;
+}
+
+.phone .brph .spn-ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #c62828;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.phone .brph .spn-ic svg {
+  width: 16px;
+  height: 16px;
+}
+
+.phone .brph .spn-a {
+  font-size: 11.5px;
+  color: #666;
+}
+
+.phone .brph .spn-a.spn-to {
+  color: #333;
+}
+
+.phone .brph .spn-t {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.phone .brph .bankdot {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #0f7a5a;
+  color: #fff;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+/* ---------- Smart-KOOD practice app ---------- */
+
+.phone .brph .skapp {
+  position: absolute;
+  inset: 34px 0 0 0;
+  background: #f6f1fb;
+  z-index: 22;
+  display: flex;
+  flex-direction: column;
+  /* the number pad is sized from the app's own height (cqh), so OK always fits on the screen */
+  container-type: size;
+  overflow: hidden;
+}
+
+.phone .brph .sk-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #6b3fa0;
+  color: #fff;
+  padding: 12px 14px;
+}
+
+.phone .brph .sk-h b {
+  font-size: 18px;
+  display: block;
+}
+
+.phone .brph .sk-h small {
+  font-size: 11.5px;
+  opacity: 0.9;
+}
+
+.phone .brph .sk-req {
+  margin: 10px 12px 0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 15px;
+  color: #222;
+  border: 1px solid #e2d6f1;
+}
+
+.phone .brph .sk-k {
+  font-weight: 900;
+  font-size: 17px;
+  color: #6b3fa0;
+  margin-bottom: 4px;
+}
+
+.phone .brph .sk-row {
+  font-size: 15px;
+}
+
+.phone .brph .pinscr {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 16px 8px;
+  color: #222;
+}
+
+.phone .brph .pinbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: min(10px, 1.2cqh);
+  padding: min(10px, 1.2cqh) 14px;
+  border-radius: 16px;
+}
+
+.phone .brph .pinbox .pt {
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.phone .brph .dots {
+  display: flex;
+  gap: 16px;
+  height: 24px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.phone .brph .dots i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
+
+.phone .brph .dots i.f {
+  background: currentColor;
+}
+
+.phone .brph .pinerr {
+  color: #c62828;
+  font-weight: 700;
+  font-size: 15px;
+  min-height: 20px;
+}
+
+.phone .brph .numpad {
+  display: grid;
+  grid-template-columns: repeat(3, min(68px, 10cqh));
+  gap: min(12px, 1.6cqh) 22px;
+  margin-top: auto;
+  padding: 8px 10px 6px;
+  border-radius: 16px;
+}
+
+.phone .brph .numpad button {
+  width: min(68px, 10cqh);
+  height: min(68px, 10cqh);
+  border-radius: 50%;
+  font-size: min(30px, 4.6cqh);
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9def6;
+  color: inherit;
+}
+
+.phone .brph .numpad button.k-ok {
+  font-size: 17px;
+  font-weight: 700;
+  background: #6b3fa0;
+  color: #fff;
+}
+
+.phone .brph .numpad button.k-txt {
+  background: none;
+  font-size: 22px;
+}
+
+.phone .brph .numpad button:active {
+  filter: brightness(0.8);
+}
