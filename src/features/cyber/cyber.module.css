@@ -1,0 +1,542 @@
+/* Cyber security house and „Aita Tiiat” (prototype classes .chouse, .task, .mini, .serp, .browser, .callscr …) */
+
+/* ---------- House page ---------- */
+
+.house {
+  max-width: 640px;
+  margin: 10px auto;
+  text-align: center;
+  padding: 0 16px 30px;
+}
+
+.house h1 {
+  font-size: 28px;
+  font-weight: 900;
+  margin: 8px 0 4px;
+}
+
+.house p {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin-bottom: 12px;
+}
+
+.house .houseNote {
+  font-size: 17px;
+  margin-top: 12px;
+}
+
+.rooms {
+  margin-top: 14px;
+}
+
+.rooms svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.roomButtons {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.roomButtons > * {
+  flex: 1;
+}
+
+@media (max-width: 420px) {
+  .roomButtons {
+    flex-direction: column;
+  }
+}
+
+/* ---------- Task page: Tiia on the left (desktop) / on top (phone) ---------- */
+
+.task {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 16px 120px;
+}
+
+.character {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.characterText {
+  flex: 1;
+}
+
+.face {
+  width: 110px;
+  flex: none;
+}
+
+.face svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .task {
+    grid-template-columns: 340px 1fr;
+    padding-bottom: 30px;
+    align-items: start;
+  }
+
+  .character {
+    flex-direction: column;
+    align-items: stretch;
+    position: sticky;
+    top: 90px;
+  }
+
+  .face {
+    width: 220px;
+    align-self: center;
+  }
+}
+
+.speech {
+  position: relative;
+  background: var(--pale);
+  border: 3px solid var(--navy);
+  border-radius: 22px;
+  padding: 14px 16px;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.hint {
+  composes: speech;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+.progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.progress i {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--line);
+}
+
+.progress i.on {
+  background: var(--navy);
+}
+
+.taskView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.answers {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.answers > * {
+  flex: 1;
+  font-size: 24px;
+  min-height: 76px;
+}
+
+.answers .scam {
+  background: var(--bad);
+  border-color: var(--bad);
+}
+
+.answers .safe {
+  background: var(--good);
+  border-color: var(--good);
+}
+
+/* ---------- Small phone frame ---------- */
+
+.mini {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 30px;
+  border: 10px solid #1b1f2a;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+}
+
+.mtop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 10px 8px;
+  gap: 4px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 13px;
+  color: #555;
+  background: #f7f7f9;
+}
+
+.mini[data-os="android"] .mtop {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8f9fe;
+}
+
+.av {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #9aa3b5;
+}
+
+.av svg {
+  width: 60%;
+  height: 60%;
+}
+
+.sender {
+  font-size: 15px;
+  color: #111;
+  font-weight: 600;
+  word-break: break-all;
+  text-align: center;
+}
+
+.mbody {
+  padding: 14px 12px 18px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+}
+
+.meta {
+  align-self: center;
+  font-size: 12px;
+  color: #777;
+  text-align: center;
+}
+
+.bubble {
+  align-self: flex-start;
+  max-width: 90%;
+  padding: 9px 14px;
+  border-radius: 20px;
+  border-bottom-left-radius: 6px;
+  background: #e9edf6;
+  color: #111;
+  font-size: 16.5px;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+.link {
+  color: #0b57d0;
+  text-decoration: underline;
+}
+
+/* A warning-sign marker. Highlighting (red / green) is added by the answer flow (#17). */
+.sig {
+  border-radius: 6px;
+  padding: 0 2px;
+  transition: all 0.25s;
+}
+
+/* ---------- Search results ---------- */
+
+.serp {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+.searchLogo {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.02em;
+  color: #4b5563;
+}
+
+.searchQuery {
+  border: 1px solid #ddd;
+  border-radius: 22px;
+  padding: 8px 14px;
+  font-size: 15px;
+}
+
+.searchQuery svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #e3e3e3;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: left;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  background: #fff;
+  cursor: pointer;
+}
+
+.result:hover:not(:disabled) {
+  border-color: var(--sky);
+}
+
+.result:disabled {
+  cursor: default;
+  color: inherit;
+}
+
+.result.picked {
+  border-color: var(--navy);
+  border-width: 3px;
+}
+
+.sponsored {
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.domain {
+  font-size: 13px;
+  color: #202124;
+  margin-top: 4px;
+}
+
+.url {
+  font-size: 11.5px;
+  color: #4d5156;
+  word-break: break-all;
+}
+
+.resultTitle {
+  font-size: 17px;
+  color: #1a0dab;
+  margin-top: 4px;
+}
+
+.description {
+  font-size: 13px;
+  color: #4d5156;
+  margin-top: 2px;
+}
+
+/* ---------- Fake bank page ---------- */
+
+.browser {
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+.address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f3f4;
+  margin: 8px;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  color: #222;
+  word-break: break-all;
+}
+
+.address svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.bankHead {
+  background: #1d8a3d;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.bankLogo {
+  background: #fff;
+  color: #1d8a3d;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 15px;
+}
+
+.bankWarning {
+  margin: 10px;
+  background: #fff6c7;
+  border: 1px solid #e8d36a;
+  padding: 10px;
+  font-size: 12.5px;
+  color: #7a1414;
+  line-height: 1.35;
+}
+
+.bankLogin {
+  padding: 4px 14px 18px;
+  font-size: 14px;
+}
+
+.bankLogin h4 {
+  font-size: 20px;
+  margin: 6px 0 10px;
+  color: #222;
+}
+
+.bankLabel {
+  color: #444;
+  font-size: 13px;
+}
+
+.bankField {
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  height: 38px;
+  margin: 4px 0 10px;
+  background: #fafafa;
+}
+
+.bankGo {
+  background: #1d8a3d;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 10px;
+  font-weight: 700;
+}
+
+/* ---------- Phone call ---------- */
+
+.callScreen {
+  background: linear-gradient(180deg, #2c3446, #141824);
+  color: #fff;
+  padding: 26px 16px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 300px;
+}
+
+.callAvatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: #59627a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cfd5e3;
+}
+
+.callAvatar svg {
+  width: 50px;
+  height: 50px;
+}
+
+.caller {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.callNumber {
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.player {
+  width: 100%;
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player button {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  color: #141824;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  cursor: pointer;
+}
+
+.player button svg {
+  width: 26px;
+  height: 26px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.progressBar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #7fb0ff;
+  transition: width 0.2s linear;
+}
+
+.playTime {
+  font-size: 14px;
+  width: 44px;
+  text-align: right;
+}
+
+.callNote {
+  font-size: 13px;
+  opacity: 0.75;
+  text-align: center;
+}
