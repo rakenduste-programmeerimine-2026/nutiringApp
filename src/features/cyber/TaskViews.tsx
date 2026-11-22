@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { CyberTask } from "@/content/cyber";
 import type { OS } from "@/content/types";
-import { LockIcon, PauseIcon, PersonIcon, PlayIcon, SearchIcon } from "./icons";
-import { SignText } from "./SignText";
+import { LockIcon, PauseIcon, PersonIcon, PlayIcon, SearchIcon, XIcon } from "./icons";
+import { Sig, SignText } from "./SignText";
 import styles from "./cyber.module.css";
 
 /* The four kinds of task, each drawn inside a small phone frame (prototype `renderTask`). */
@@ -138,11 +138,11 @@ export function BankView({ os }: { os: OS }) {
           <span>Internetipank</span>
         </div>
         <div className={styles.bankWarning}>
-          <span className={styles.sig} data-s={2}>
+          <Sig sign={2}>
             <b>Oluline sõnum!</b> Täna testime SEPA Instant süsteemi. Kui olete oma online-kontole
             sisse loginud, nõutakse meie simulatsiooni ülekannet kontole NL**BUNQ**. Tähelepanu! See
             ülekanne on lihtsalt simulatsioon ja teie kontolt raha ei võeta!
-          </span>
+          </Sig>
         </div>
         <div className={styles.bankLogin}>
           <h4>
@@ -166,9 +166,11 @@ type CallViewProps = {
   os: OS;
   /** Called once when the recording has been played to the end. */
   onPlayed: () => void;
+  /** After answering: how many signs have been shown so far (a call has no text to mark). */
+  signsShown?: number;
 };
 
-export function CallView({ task, os, onPlayed }: CallViewProps) {
+export function CallView({ task, os, onPlayed, signsShown = 0 }: CallViewProps) {
   const [elapsed, setElapsed] = useState(0);
   const [playing, setPlaying] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -225,6 +227,16 @@ export function CallView({ task, os, onPlayed }: CallViewProps) {
           <div className={styles.playTime}>0:0{Math.floor(elapsed)}</div>
         </div>
         <div className={styles.callNote}>Näidisheli. Päris kõne salvestis lisatakse hiljem.</div>
+        {signsShown > 0 && (
+          <ul className={styles.callSigns} aria-label="Ohumärgid kõnes">
+            {task.signs.slice(0, signsShown).map((s, i) => (
+              <li key={s.title} className={i === signsShown - 1 ? styles.current : undefined}>
+                <XIcon />
+                <span>{s.title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </MiniPhone>
   );
