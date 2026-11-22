@@ -10,7 +10,6 @@ export const NUTIROBO_REPLIES = [
   "Väga tore sinuga tuttavaks saada! Jätkame õpetusega.",
 ] as const;
 
-
 const info = (text: Text, target?: Text, extra: Partial<Step> = {}): Step => ({
   type: "info",
   text,
@@ -135,9 +134,14 @@ export const messages: House = {
           { until: "keyLong" },
           { hint: "Hoia sõrme o-tähel umbes üks sekund." },
         ),
-        kb("Vali aknast täht <b>õ</b>.", '.accpop [data-k="ch:õ"]', {
-          input: "Tere õ",
-        }),
+        kb(
+          "<b>Libista sõrm</b> tähele <b>õ</b> ja lase lahti.",
+          '.accpop [data-k="ch:õ"]',
+          { input: "Tere õ" },
+          {
+            hint: "Ära tõsta sõrme üles: libista see õ peale ja alles siis lase lahti.",
+          },
+        ),
         kb(
           "Kirjuta edasi: <b>htust</b>.",
           ".kb",
