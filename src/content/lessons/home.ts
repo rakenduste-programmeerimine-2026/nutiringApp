@@ -332,7 +332,21 @@ export const home: House = {
           "[data-tile=torch]",
           "tile:torch",
         ),
-        goHome(),
+        act(
+          {
+            android:
+              "Kiirseadete sulgemiseks <b>pühi alt üles</b> või vajuta <b>ringi ●</b>.",
+            ios: "Juhtimiskeskuse sulgemiseks <b>pühi ekraani alumisest servast üles</b>.",
+          },
+          { android: ".shadehandle, .nav-home", ios: ".homeind" },
+          "goHome",
+          {
+            hint: {
+              android: "Libista sõrme alt üles või vajuta ringi ●.",
+              ios: "Pane sõrm alumisele joonele ja libista üles.",
+            },
+          },
+        ),
       ],
     },
     {
@@ -542,7 +556,7 @@ export const home: House = {
           { os: "android" },
         ),
         act(
-          "<b>Pühi alt üles ja hoia sõrme</b> hetk ekraanil, kuni näed avatud rakendusi. Siin harjutuses: hoia sõrme joonel.",
+          "<b>Pühi alt üles ja hoia sõrme</b> hetk ekraanil, kuni näed avatud rakendusi.",
           ".homeind",
           "openRecents",
           { os: "ios", hint: "Hoia sõrme joonel umbes üks sekund." },
