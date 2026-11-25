@@ -70,3 +70,31 @@ describe("Nutirobo steps", () => {
     for (const i of idx) expect(NUTIROBO_REPLIES[i]).toBeTruthy();
   });
 });
+
+describe("Home lesson 4 quick-settings tiles", () => {
+  const lesson = home.lessons.find((l) => l.title === "Kiirseaded")!;
+  const tileSteps = lesson.steps.filter(
+    (s) =>
+      s.type === "info" &&
+      typeof s.target === "object" &&
+      s.target.android.startsWith("[data-tile="),
+  );
+  const tiles = (os: "android" | "ios") =>
+    tileSteps.map((s) => (s.target as Record<typeof os, string>)[os]);
+  const selectors = (names: string[]) => names.map((n) => `[data-tile=${n}]`);
+
+  it("goes through the tiles in each system's screen order", () => {
+    expect(tiles("android")).toEqual(
+      selectors(["wifi", "data", "torch", "silent", "rotate", "plane"]),
+    );
+    expect(tiles("ios")).toEqual(
+      selectors(["plane", "data", "wifi", "rotate", "torch", "silent"]),
+    );
+  });
+
+  it("explains the tile it highlights", () => {
+    const first = tileSteps[0].text as { android: string; ios: string };
+    expect(first.android).toContain("Wi-Fi:");
+    expect(first.ios).toContain("Airplane Mode");
+  });
+});
