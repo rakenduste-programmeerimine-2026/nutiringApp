@@ -12,6 +12,8 @@ import type { ActData } from "./types";
      data-swipe="up|down|left|right|side" (+ data-swipe-act="unlock")   swipe
        + data-swipe-follow           the element moves with the finger (see below)
        + data-swipe-drag             the house is told how far the finger pulled
+       + data-swipe-hold="name"      swipe, then pause with the finger down → "name"
+                                     (iPhone: swipe up from the bottom line and pause)
      data-slide="h|v"                drag a slider; sends act "slide" { v: 5–100 }
      data-base="o" + data-long       keyboard letter: hold → accent popup, then
                                      slide the same finger onto a letter and lift
@@ -77,6 +79,8 @@ export function swipeMatches(dir: string, dx: number, dy: number): boolean {
 
 /** A moving swipe needs a bit more distance than a quick one. */
 export const FOLLOW_MIN = 60;
+/** Swipe and then keep the finger still this long (ms) → data-swipe-hold action. */
+export const SWIPE_HOLD_MS = 400;
 /** Slide-off / spring-back animation (ms). */
 export const SWIPE_ANIM_MS = 200;
 
@@ -99,9 +103,23 @@ export function swipeOffset(dir: string, dx: number, dy: number): { x: number; y
 }
 
 /** Far enough for a swipe whose element moves with the finger? */
-export function followDone(dir: string, dx: number, dy: number): boolean {
+export function followDone(dir: string, dx: number, dy: number, min = FOLLOW_MIN): boolean {
   const o = swipeOffset(dir, dx, dy);
-  return Math.abs(o.x) >= FOLLOW_MIN || Math.abs(o.y) >= FOLLOW_MIN;
+  return Math.abs(o.x) >= min || Math.abs(o.y) >= min;
+}
+
+/** A pull (data-swipe-drag) must cover this share of the screen when done slowly… */
+export const DRAG_FRACTION = 0.35;
+/** …or be a quick flick: at least FOLLOW_MIN px in under this many ms (like a real phone). */
+export const FLICK_MS = 250;
+
+/**
+ * Is a pull (lock screen, notification panel) done?
+ * `area` = the phone screen's size along the swipe, `ms` = how long the finger was down.
+ */
+export function dragDone(dir: string, dx: number, dy: number, area: number, ms: number): boolean {
+  if (ms < FLICK_MS && followDone(dir, dx, dy)) return true; // quick flick
+  return followDone(dir, dx, dy, Math.max(FOLLOW_MIN, area * DRAG_FRACTION)); // slow pull
 }
 
 /** The user asked the system for less motion (accessibility setting). */
@@ -152,6 +170,14 @@ type Press = {
   /** accent popup open: the finger chooses a letter */
   accent: boolean;
   lastLetter: string;
+  /** when the finger touched down (ms) – to tell a quick flick from a slow pull */
+  t0: number;
+  /** size of the phone screen (px) – a slow pull must cover part of it */
+  area: { width: number; height: number };
+  /** swipe-and-hold: timer + where the finger was when it started waiting */
+  holdTimer?: ReturnType<typeof setTimeout>;
+  hx: number;
+  hy: number;
 };
 
 export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: GestureOptions) {
@@ -159,7 +185,11 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
 
   const stopTimer = (p: Press | null) => {
     if (p?.timer) clearTimeout(p.timer);
-    if (p) p.timer = undefined;
+    if (p?.holdTimer) clearTimeout(p.holdTimer);
+    if (p) {
+      p.timer = undefined;
+      p.holdTimer = undefined;
+    }
   };
 
   const onPointerDown = (e: PointerEvent<HTMLElement>) => {
@@ -176,7 +206,19 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
     }
     // keep receiving move/up for this finger even outside the element
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    const p: Press = { el, x: e.clientX, y: e.clientY, longFired: false, accent: false, lastLetter: "" };
+    const screenBox = e.currentTarget.getBoundingClientRect();
+    const p: Press = {
+      el,
+      x: e.clientX,
+      y: e.clientY,
+      longFired: false,
+      accent: false,
+      lastLetter: "",
+      t0: Date.now(),
+      area: { width: screenBox.width, height: screenBox.height },
+      hx: e.clientX,
+      hy: e.clientY,
+    };
     press.current = p;
 
     if (el.dataset.slide) {
@@ -213,10 +255,30 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
     const dx = e.clientX - p.x;
     const dy = e.clientY - p.y;
     // moving away cancels a long press (like on a real phone)
-    if (Math.hypot(dx, dy) > MOVE_TOLERANCE) stopTimer(p);
+    if (Math.hypot(dx, dy) > MOVE_TOLERANCE && p.timer) {
+      clearTimeout(p.timer);
+      p.timer = undefined;
+    }
 
     const dir = p.el.dataset.swipe;
     if (!dir) return;
+
+    // swipe-and-hold (iPhone: swipe up from the bottom line and pause → open apps):
+    // once the finger has swiped far enough, wait until it stays still for SWIPE_HOLD_MS
+    const hold = p.el.dataset.swipeHold;
+    if (hold && !p.longFired && swipeMatches(dir, dx, dy)) {
+      const movedSinceWait = Math.hypot(e.clientX - p.hx, e.clientY - p.hy) > MOVE_TOLERANCE;
+      if (!p.holdTimer || movedSinceWait) {
+        if (p.holdTimer) clearTimeout(p.holdTimer);
+        p.hx = e.clientX;
+        p.hy = e.clientY;
+        p.holdTimer = setTimeout(() => {
+          p.holdTimer = undefined;
+          p.longFired = true; // the release must not also count as a swipe
+          onAct(hold, dataOf(p.el));
+        }, SWIPE_HOLD_MS);
+      }
+    }
     const o = swipeOffset(dir, dx, dy);
     if (p.el.dataset.swipeFollow !== undefined) setTransform(p.el, o.x, o.y, false);
     if (p.el.dataset.swipeDrag !== undefined)
@@ -224,8 +286,14 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
   };
 
   /** Finger lifted after a moving swipe: slide off + act, or spring back. */
-  const finishMovingSwipe = (el: HTMLElement, dir: string, dx: number, dy: number) => {
-    const done = followDone(dir, dx, dy);
+  const finishMovingSwipe = (p: Press, dir: string, dx: number, dy: number) => {
+    const el = p.el;
+    const vertical = dir === "up" || dir === "down";
+    // a pull (panel, lock screen) needs a real pull or a quick flick; a following element needs FOLLOW_MIN
+    const done =
+      el.dataset.swipeDrag !== undefined
+        ? dragDone(dir, dx, dy, vertical ? p.area.height : p.area.width, Date.now() - p.t0)
+        : followDone(dir, dx, dy);
     const action = el.dataset.swipeAct || el.dataset.act || "";
     const data = dataOf(el);
 
@@ -279,7 +347,7 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
     const swipe = el.dataset.swipe;
 
     const moving = el.dataset.swipeFollow !== undefined || el.dataset.swipeDrag !== undefined;
-    if (swipe && moving && (moved || el.style.transform)) return finishMovingSwipe(el, swipe, dx, dy);
+    if (swipe && moving && (moved || el.style.transform)) return finishMovingSwipe(p, swipe, dx, dy);
     if (swipe && moved) {
       if (swipeMatches(swipe, dx, dy)) onAct(el.dataset.swipeAct || el.dataset.act || "", dataOf(el));
       return;

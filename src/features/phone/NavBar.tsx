@@ -5,7 +5,10 @@ type NavBarProps = {
   os: OS;
   /** White buttons / line on a dark background. */
   dark?: boolean;
-  /** iPhone: holding the bottom line opens the open-apps view (event "openRecents"). */
+  /**
+   * iPhone: open the open-apps view (event "openRecents") like a real iPhone –
+   * swipe up from the bottom line and pause, or hold the line.
+   */
   iosLongPress?: boolean;
 };
 
@@ -36,7 +39,7 @@ export function NavBar({ os, dark = false, iosLongPress = false }: NavBarProps) 
       className={`homeind${dark ? " light" : ""}`}
       data-act="navHome"
       data-swipe="up"
-      {...(iosLongPress ? { "data-long": "openRecents" } : {})}
+      {...(iosLongPress ? { "data-long": "openRecents", "data-swipe-hold": "openRecents" } : {})}
     >
       <i />
     </div>

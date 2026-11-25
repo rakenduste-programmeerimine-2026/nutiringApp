@@ -109,11 +109,13 @@ export function LessonHouse<S>({ house, module, os }: LessonHouseProps<S>) {
 
     const card = cardRef.current;
     if (card) {
-      const pos = cardPosition({ target, phone: inner, cardHeight: card.offsetHeight, cardAt: step?.cardAt });
+      // the lesson decides first; otherwise the house may ask for a place (e.g. "far")
+      const cardAt = step?.cardAt ?? (step ? module.cardAt?.(run.phone, step, os) : undefined);
+      const pos = cardPosition({ target, phone: inner, cardHeight: card.offsetHeight, cardAt });
       card.style.top = pos.top !== undefined ? `${pos.top}px` : "";
       card.style.bottom = pos.bottom !== undefined ? `${pos.bottom}px` : "";
     }
-  }, [step, targetSelector]);
+  }, [step, targetSelector, module, run.phone, os]);
 
   // after every redraw, and when the window size changes
   useLayoutEffect(() => {

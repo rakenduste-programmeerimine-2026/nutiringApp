@@ -133,6 +133,11 @@ export function appNameForText(os: OS, key: AppKey): string {
   return `${app.i} (${app.a.toLowerCase()})`;
 }
 
+/** Only the app's icon drawing (no coloured tile), e.g. for lock-screen buttons. */
+export function appGlyph(os: OS, key: AppKey): ReactNode {
+  return (APPS[key] as AppDef).icon(os);
+}
+
 /** Just the coloured icon tile (prototype appIconRaw). */
 export function AppTile({ os, app, className = "ic" }: { os: OS; app: AppKey; className?: string }) {
   const def = APPS[app];

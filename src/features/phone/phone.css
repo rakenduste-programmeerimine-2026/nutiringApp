@@ -135,6 +135,15 @@
   height: 44px;
   padding: 0 26px;
 }
+/* iPhone: left half = notifications, right half = Control Center, so each
+   side covers its whole half (for touching and for the lesson highlight) */
+.phone.ios .sb .sbl,
+.phone.ios .sb .sbr {
+  flex: 1;
+}
+.phone.ios .sb .sbr {
+  justify-content: flex-end;
+}
 .phone .sbi {
   display: inline-flex;
   align-items: center;
@@ -234,6 +243,79 @@
 .phone .ic svg {
   width: 60%;
   height: 60%;
+}
+
+/* ---------- number pad + PIN dots (prototype .numpad, .dots) ---------- */
+.phone .pinpad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 12px 22px;
+  margin-top: auto;
+  padding: 8px 10px 6px;
+  border-radius: 16px;
+}
+.phone .pinpad button {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.06);
+  color: inherit;
+  font-family: inherit;
+}
+.phone .dark .pinpad button {
+  background: rgba(255, 255, 255, 0.14);
+}
+.phone.ios .pinpad button {
+  background: rgba(255, 255, 255, 0.22);
+}
+.phone .pinpad button.k-ok {
+  font-size: 17px;
+  font-weight: 700;
+  background: #1a73e8;
+  color: #fff;
+}
+.phone .pinpad button.k-txt {
+  background: none;
+  font-size: 22px;
+  font-weight: 600;
+}
+.phone .pinpad button:active {
+  filter: brightness(0.8);
+}
+.phone .pindots {
+  display: flex;
+  gap: 16px;
+  height: 24px;
+  align-items: center;
+  margin-top: 8px;
+}
+.phone .pindots i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+}
+.phone .pindots i.f {
+  background: currentColor;
+}
+/* phones: the pad shrinks with the screen height so OK always fits */
+@media (max-width: 899px) {
+  .phone .pinpad {
+    grid-template-columns: repeat(3, min(66px, 7.4vh));
+    gap: min(10px, 1.1vh) 24px;
+    padding-bottom: 4px;
+  }
+  .phone .pinpad button {
+    width: min(66px, 7.4vh);
+    height: min(66px, 7.4vh);
+    font-size: min(28px, 3.3vh);
+  }
 }
 
 /* ---------- keyboard ---------- */
