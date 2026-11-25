@@ -12,6 +12,8 @@ import type { ActData } from "./types";
      data-swipe="up|down|left|right|side" (+ data-swipe-act="unlock")   swipe
        + data-swipe-follow           the element moves with the finger (see below)
        + data-swipe-drag             the house is told how far the finger pulled
+       + data-swipe-hold="name"      swipe, then pause with the finger down → "name"
+                                     (iPhone: swipe up from the bottom line and pause)
      data-slide="h|v"                drag a slider; sends act "slide" { v: 5–100 }
      data-base="o" + data-long       keyboard letter: hold → accent popup, then
                                      slide the same finger onto a letter and lift
@@ -77,6 +79,8 @@ export function swipeMatches(dir: string, dx: number, dy: number): boolean {
 
 /** A moving swipe needs a bit more distance than a quick one. */
 export const FOLLOW_MIN = 60;
+/** Swipe and then keep the finger still this long (ms) → data-swipe-hold action. */
+export const SWIPE_HOLD_MS = 400;
 /** Slide-off / spring-back animation (ms). */
 export const SWIPE_ANIM_MS = 200;
 
@@ -170,6 +174,10 @@ type Press = {
   t0: number;
   /** size of the phone screen (px) – a slow pull must cover part of it */
   area: { width: number; height: number };
+  /** swipe-and-hold: timer + where the finger was when it started waiting */
+  holdTimer?: ReturnType<typeof setTimeout>;
+  hx: number;
+  hy: number;
 };
 
 export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: GestureOptions) {
@@ -177,7 +185,11 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
 
   const stopTimer = (p: Press | null) => {
     if (p?.timer) clearTimeout(p.timer);
-    if (p) p.timer = undefined;
+    if (p?.holdTimer) clearTimeout(p.holdTimer);
+    if (p) {
+      p.timer = undefined;
+      p.holdTimer = undefined;
+    }
   };
 
   const onPointerDown = (e: PointerEvent<HTMLElement>) => {
@@ -204,6 +216,8 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
       lastLetter: "",
       t0: Date.now(),
       area: { width: screenBox.width, height: screenBox.height },
+      hx: e.clientX,
+      hy: e.clientY,
     };
     press.current = p;
 
@@ -241,10 +255,30 @@ export function usePhoneGestures({ isAllowed, onBlocked, onAct, expects }: Gestu
     const dx = e.clientX - p.x;
     const dy = e.clientY - p.y;
     // moving away cancels a long press (like on a real phone)
-    if (Math.hypot(dx, dy) > MOVE_TOLERANCE) stopTimer(p);
+    if (Math.hypot(dx, dy) > MOVE_TOLERANCE && p.timer) {
+      clearTimeout(p.timer);
+      p.timer = undefined;
+    }
 
     const dir = p.el.dataset.swipe;
     if (!dir) return;
+
+    // swipe-and-hold (iPhone: swipe up from the bottom line and pause → open apps):
+    // once the finger has swiped far enough, wait until it stays still for SWIPE_HOLD_MS
+    const hold = p.el.dataset.swipeHold;
+    if (hold && !p.longFired && swipeMatches(dir, dx, dy)) {
+      const movedSinceWait = Math.hypot(e.clientX - p.hx, e.clientY - p.hy) > MOVE_TOLERANCE;
+      if (!p.holdTimer || movedSinceWait) {
+        if (p.holdTimer) clearTimeout(p.holdTimer);
+        p.hx = e.clientX;
+        p.hy = e.clientY;
+        p.holdTimer = setTimeout(() => {
+          p.holdTimer = undefined;
+          p.longFired = true; // the release must not also count as a swipe
+          onAct(hold, dataOf(p.el));
+        }, SWIPE_HOLD_MS);
+      }
+    }
     const o = swipeOffset(dir, dx, dy);
     if (p.el.dataset.swipeFollow !== undefined) setTransform(p.el, o.x, o.y, false);
     if (p.el.dataset.swipeDrag !== undefined)

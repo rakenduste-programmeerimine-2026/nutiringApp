@@ -42,7 +42,7 @@ export function PinPad({ withOk }: { withOk: boolean }) {
 /** Filled / empty circles showing how many digits are entered. */
 export function PinDots({ value, length = 4 }: { value: string; length?: number }) {
   return (
-    <div className="dots" aria-label={`${value.length}/${length}`}>
+    <div className="dots pindots" aria-label={`${value.length}/${length}`}>
       {Array.from({ length }, (_, i) => (
         <i key={i} className={i < value.length ? "f" : ""} />
       ))}

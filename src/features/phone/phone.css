@@ -279,20 +279,20 @@
 .phone .pinpad button:active {
   filter: brightness(0.8);
 }
-.phone .dots {
+.phone .pindots {
   display: flex;
   gap: 16px;
   height: 24px;
   align-items: center;
   margin-top: 8px;
 }
-.phone .dots i {
+.phone .pindots i {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   border: 2px solid currentColor;
 }
-.phone .dots i.f {
+.phone .pindots i.f {
   background: currentColor;
 }
 /* phones: the pad shrinks with the screen height so OK always fits */

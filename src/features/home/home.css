@@ -1,9 +1,11 @@
 /* Home screen replica styles, copied from the prototype.
    GLOBAL class names on purpose: the lessons (src/content/lessons/home.ts)
-   find elements by them. Everything is scoped under .phone. */
+   find elements by them. Everything is scoped under .phone .homeph (the box
+   HomePhone draws around every screen), so other houses with the same class
+   names (e.g. Küberbrauser .pinscr, .results) are never affected. */
 
 /* ---------- brightness ---------- */
-.phone .dimmer {
+.phone .homeph .dimmer {
   position: absolute;
   inset: 0;
   background: #000;
@@ -12,18 +14,18 @@
 }
 
 /* ---------- code screens (SIM PIN, screen lock) ---------- */
-.phone .pinscr {
+.phone .homeph .pinscr {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 96px 16px 8px;
 }
-.phone .pinscr.dark {
+.phone .homeph .pinscr.dark {
   background: #1c1c1e;
   color: #fff;
 }
-.phone .pinbox {
+.phone .homeph .pinbox {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,75 +34,75 @@
   border-radius: 16px;
   margin-top: 10px;
 }
-.phone .pinbox .pt {
+.phone .homeph .pinbox .pt {
   font-size: 19px;
   font-weight: 600;
   text-align: center;
 }
-.phone .pinbox .ps {
+.phone .homeph .pinbox .ps {
   font-size: 14px;
   opacity: 0.7;
   text-align: center;
 }
-.phone .pinerr {
+.phone .homeph .pinerr {
   color: #ff6b6b;
   font-weight: 700;
   font-size: 15px;
   min-height: 20px;
 }
 @media (max-width: 899px) {
-  .phone .pinscr {
+  .phone .homeph .pinscr {
     padding-top: min(150px, 17vh);
   }
-  .phone .pinbox {
+  .phone .homeph .pinbox {
     gap: 4px;
     margin-top: 4px;
     padding: 6px 10px;
   }
-  .phone .pinbox .pt {
+  .phone .homeph .pinbox .pt {
     font-size: 17px;
   }
 }
 
 /* ---------- lock screen ---------- */
-.phone .lock {
+.phone .homeph .lock {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: #fff;
 }
-.phone .lock .lt {
+.phone .homeph .lock .lt {
   font-size: 78px;
   font-weight: 300;
   line-height: 1;
   margin-top: 40px;
 }
-.phone.ios .lock .lt {
+.phone.ios .homeph .lock .lt {
   font-weight: 700;
   font-size: 86px;
   margin-top: 20px;
 }
-.phone .lock .ld {
+.phone .homeph .lock .ld {
   font-size: 18px;
   font-weight: 600;
   margin-top: 8px;
 }
-.phone.ios .lock .ld {
+.phone.ios .homeph .lock .ld {
   order: -1;
   margin-top: 24px;
 }
-.phone .lock .sp {
+.phone .homeph .lock .sp {
   flex: 1;
 }
-.phone .lockrow {
+.phone .homeph .lockrow {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   padding: 0 22px 8px;
 }
-.phone .lkbtn {
+.phone .homeph .lkbtn {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -111,11 +113,11 @@
   color: #fff;
   flex: none;
 }
-.phone .lkbtn svg {
+.phone .homeph .lkbtn svg {
   width: 24px;
   height: 24px;
 }
-.phone .swipeup {
+.phone .homeph .swipeup {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -125,7 +127,7 @@
   padding: 10px 6px;
   border-radius: 20px;
 }
-.phone .swipeup svg {
+.phone .homeph .swipeup svg {
   width: 28px;
   height: 28px;
   animation: bob 1.4s ease-in-out infinite;
@@ -136,15 +138,590 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .phone .swipeup svg {
+  .phone .homeph .swipeup svg {
     animation: none;
   }
 }
 
 /* ---------- home screen ---------- */
-.phone .home {
+.phone .homeph .home {
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* the box around every Home screen (HomePhone) */
+.phone .homeph {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- home screen: app grid, dock, wallpaper area ---------- */
+.phone .homeph .appgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 6px;
+  padding: 10px 12px;
+}
+.phone .homeph .dock {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 10px 12px;
+  margin: 0 10px 6px;
+}
+.phone .homeph .dock.dock5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+.phone.ios .homeph .dock {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+}
+.phone .homeph .apps-btn .ic {
+  background: rgba(255, 255, 255, 0.9);
+  color: #3c4043;
+}
+.phone .homeph .space {
+  flex: 1;
+}
+.phone .homeph .wallempty {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 26%;
+  border-radius: 20px;
+}
+.phone .homeph .clockw {
+  color: #fff;
+  text-align: center;
+  padding-top: 26px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+.phone .homeph .clockw .t {
+  font-size: 54px;
+  font-weight: 300;
+  line-height: 1;
+}
+.phone .homeph .clockw .d {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.phone .homeph .drawerhandle {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 0;
+}
+.phone .homeph .drawerhandle span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  padding: 2px 30px;
+  border-radius: 12px;
+}
+.phone .homeph .drawerhandle svg {
+  width: 22px;
+  height: 22px;
+}
+.phone .homeph .pagedots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 0 10px;
+}
+.phone .homeph .pagedots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+}
+.phone .homeph .pagedots i.on {
+  background: #fff;
+}
+
+/* ---------- long press: Android menu, iPhone edit mode ---------- */
+.phone .homeph .menuclose {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.25);
+}
+.phone .homeph .lmenu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 56px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 10px;
+  z-index: 20;
+}
+.phone .homeph .lmenu button {
+  background: #fff;
+  border: none;
+  border-radius: 18px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1d1d1f;
+  width: 31%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+.phone .homeph .lmenu svg {
+  width: 26px;
+  height: 26px;
+}
+.phone .homeph .jiggle .homegrid {
+  margin-top: 48px;
+}
+.phone .homeph .jiggle .appgrid .app,
+.phone .homeph .jiggle .dock .app {
+  animation: jig 0.25s ease-in-out infinite alternate;
+}
+@keyframes jig {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone .homeph .jiggle .app {
+    animation: none;
+  }
+}
+.phone .homeph .iosedit {
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
+  z-index: 20;
+}
+.phone .homeph .iosedit button {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  min-width: 44px;
+}
+
+/* ---------- all apps / App Library, search ---------- */
+.phone .homeph .drawer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f3f5fb;
+  position: relative;
+  min-height: 0;
+}
+.phone.ios .homeph .drawer {
+  background: linear-gradient(170deg, #7d9df0 0%, #b9c9f7 50%, #f6dccb 100%);
+}
+.phone .homeph .drawer .appgrid {
+  overflow: auto;
+}
+.phone .homeph .drawer .appgrid .app {
+  color: #1d1d1f;
+  text-shadow: none;
+}
+.phone.ios .homeph .drawer .appgrid .app {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.phone .homeph .searchbar {
+  margin: 8px 14px;
+  height: 48px;
+  border-radius: 24px;
+  background: #e3e8f4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  color: #444;
+  font-size: 16px;
+}
+.phone.ios .homeph .searchbar {
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  height: 44px;
+}
+.phone .homeph .searchbar svg {
+  width: 18px;
+  height: 18px;
+  color: #555;
+}
+.phone .homeph .searchbar .q {
+  color: #111;
+  font-weight: 600;
+}
+.phone .homeph .caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: #1a73e8;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+  margin-left: -8px;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.phone .homeph .libtitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  padding: 4px 16px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+/* results fill the space between the search bar and the keyboard and scroll,
+   so the keyboard always stays at the bottom */
+.phone .homeph .results {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.phone .homeph .results > * {
+  flex: none;
+}
+.phone .homeph .result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  color: #111;
+  text-align: left;
+}
+.phone .homeph .result .ic {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone.ios .homeph .result .ic {
+  border-radius: 10px;
+}
+.phone .homeph .result .ic svg {
+  width: 60%;
+  height: 60%;
+}
+.phone .homeph .noresult {
+  padding: 10px;
+  color: #555;
+}
+.phone.ios .homeph .noresult {
+  color: #fff;
+}
+.phone .homeph .ctxclose {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+}
+.phone .homeph .ctx {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  min-width: 220px;
+  overflow: hidden;
+  z-index: 30;
+}
+.phone .homeph .ctx button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+  color: #1d1d1f;
+}
+.phone .homeph .ctx button:last-child {
+  border-bottom: none;
+}
+.phone .homeph .ctx svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- opened apps ---------- */
+.phone .homeph .appscr {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.phone .homeph .appbar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 20px;
+  font-weight: 600;
+  gap: 12px;
+  color: #111;
+}
+.phone .homeph .appbar .ic {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone .homeph .appbar .ic svg {
+  width: 60%;
+  height: 60%;
+}
+.phone .homeph .appbody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #333;
+}
+.phone .homeph .camview {
+  flex: 1;
+  background: #222 linear-gradient(180deg, #3a4a5e, #1e2530);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+  color: #fff;
+}
+.phone .homeph .camhint {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  opacity: 0.8;
+}
+.phone .homeph .shutter {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Clock app ---------- */
+.phone .homeph .clockapp {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.phone .homeph .clkhead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  min-height: 52px;
+}
+.phone .homeph .clkt {
+  font-size: 24px;
+  font-weight: 600;
+}
+.phone.ios .homeph .clkt {
+  font-size: 30px;
+  font-weight: 800;
+}
+.phone .homeph .ios-back {
+  color: #ff9f0a;
+  background: none;
+  border: none;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 6px 4px;
+}
+.phone .homeph .clkbig {
+  text-align: center;
+  font-size: 64px;
+  font-weight: 300;
+  margin-top: 40px;
+}
+.phone .homeph .clkbig small {
+  display: block;
+  font-size: 15px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+.phone .homeph .alarms {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 14px;
+}
+.phone .homeph .alarm {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(127, 127, 127, 0.12);
+  border-radius: 18px;
+  padding: 12px 16px;
+}
+.phone .homeph .alarm .at {
+  font-size: 34px;
+  font-weight: 300;
+}
+.phone .homeph .alarm .adl {
+  font-size: 13px;
+  opacity: 0.75;
+}
+.phone .homeph .tgl {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background: #bbb;
+  position: relative;
+  flex: none;
+}
+.phone .homeph .tgl i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+}
+.phone .homeph .tgl.on {
+  background: #1a73e8;
+}
+.phone.ios .homeph .tgl.on {
+  background: #34c759;
+}
+.phone .homeph .tgl.on i {
+  left: 23px;
+}
+.phone .homeph .clktabs {
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 4px 4px;
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+}
+.phone .homeph .ctab {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 6px;
+  border: none;
+  background: none;
+  border-radius: 12px;
+  opacity: 0.75;
+  color: inherit;
+}
+.phone .homeph .ctab.on {
+  opacity: 1;
+  color: #1a73e8;
+}
+.phone.ios .homeph .ctab.on {
+  color: #ff9f0a;
+}
+
+/* ---------- open apps ---------- */
+.phone .homeph .recents {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.phone .homeph .rrow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 0 20px;
+}
+.phone .homeph .rcard {
+  width: 62%;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  touch-action: none;
+}
+.phone .homeph .rlabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.phone .homeph .rlabel .ic {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone .homeph .rlabel .ic svg {
+  width: 60%;
+  height: 60%;
+}
+.phone .homeph .rshot {
+  height: 330px;
+  border-radius: 20px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  font-weight: 300;
+}
+.phone .homeph .rshot.dark {
+  background: #f8f9fe;
+  color: #111;
+}
+.phone.ios .homeph .rshot.dark {
+  background: #000;
+  color: #fff;
+}
+.phone .homeph .rcard[data-r="browser"] .rshot {
+  background: #e8eefb;
+}
+.phone .homeph .norecents {
+  color: #fff;
+  opacity: 0.8;
+  font-size: 17px;
 }
