@@ -10,5 +10,6 @@ import type { HomeState } from "../state";
 export function HomeStatusBar({ s, os, light }: { s: HomeState; os: OS; light: boolean }) {
   const swipe =
     !s.sb ? {} : os === "android" ? { all: s.sb } : s.sb === "openNotif" ? { left: s.sb } : { right: s.sb };
-  return <StatusBar os={os} light={light} notifs={s.notifs} sound swipe={swipe} />;
+  // the panel follows the finger while it is pulled down
+  return <StatusBar os={os} light={light} notifs={s.notifs} sound swipe={swipe} swipeDrag />;
 }

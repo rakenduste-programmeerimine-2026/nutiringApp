@@ -3,12 +3,36 @@ import type { OS } from "@/content/types";
 import type { ActData, ActResult, HouseModule } from "@/features/lessons";
 import { keyboardAction, pinPress, t, type AppKey, type StatusNotif } from "@/features/phone";
 import { HomePhone } from "./HomePhone";
-import { START_BRIGHTNESS, initialHome, openApp, type HomeState, type QuickTile } from "./state";
+import {
+  PANEL_ANIM_MS,
+  START_BRIGHTNESS,
+  initialHome,
+  isPanel,
+  openApp,
+  type HomeState,
+  type QuickTile,
+  type Screen,
+} from "./state";
 
 /* The Home screen house for the lesson engine (prototype HOME.act).
    Event names match src/content/lessons/home.ts. */
 
 const done = (state: HomeState, event?: string): ActResult<HomeState> => ({ state, event });
+
+/**
+ * Leave the current screen for `scr`. If a panel (notifications / quick settings)
+ * was open, it stays on screen for PANEL_ANIM_MS while it slides up; the engine
+ * runs the delayed change (and cancels it on „Tagasi”).
+ */
+function closeTo(s: HomeState, scr: Screen, event: string): ActResult<HomeState> {
+  const next: HomeState = { ...s, scr, ctx: null, shadePull: 0 };
+  if (!isPanel(s.scr)) return { state: next, event };
+  return {
+    state: { ...next, shadeClosing: s.scr === "notif" ? "notif" : "qs" },
+    event,
+    effects: [{ after: PANEL_ANIM_MS, apply: (x) => ({ ...x, shadeClosing: "" }) }],
+  };
+}
 
 /** SIM PIN / screen lock: a key on the number pad. */
 function pad(s: HomeState, key: string, os: OS): ActResult<HomeState> {
@@ -38,11 +62,14 @@ function act(s: HomeState, action: string, data: ActData, os: OS): ActResult<Hom
   switch (action) {
     case "pad":
       return pad(s, data.d ?? "", os);
-    // lock screen: the finger pulls the whole screen up
-    case "swipeDrag":
-      return done(s.scr === "lock" ? { ...s, lockPull: Number(data.dy) || 0 } : s);
+    // pulls that move with the finger: the lock screen up, a panel down (or back up)
+    case "swipeDrag": {
+      const dy = Number(data.dy) || 0;
+      if (s.scr === "lock") return done({ ...s, lockPull: dy });
+      return done({ ...s, shadePull: dy });
+    }
     case "swipeDragEnd":
-      return done({ ...s, lockPull: 0 });
+      return done({ ...s, lockPull: 0, shadePull: 0 });
     case "unlock":
       return done({ ...s, scr: "pass", lockPull: 0 });
     case "longHome":
@@ -55,10 +82,10 @@ function act(s: HomeState, action: string, data: ActData, os: OS): ActResult<Hom
       return done({ ...s, scr: `app:${app}`, ctx: null, clockPage: "clock", recents }, `open:${app}`);
     }
     case "navHome":
-      return done({ ...s, scr: "home", ctx: null }, "goHome");
+      return closeTo(s, "home", "goHome");
     case "navBack":
       if (openApp(s.scr) === "clock" && s.clockPage === "alarms") return done({ ...s, clockPage: "clock" }, "backClock");
-      return done({ ...s, scr: s.scr === "search" ? "drawer" : "home" }, "goHome");
+      return closeTo(s, s.scr === "search" ? "drawer" : "home", "goHome");
     case "appBack": // iPhone „‹ Clock”
       return done({ ...s, clockPage: "clock" }, "backClock");
     case "alarms":
@@ -73,13 +100,15 @@ function act(s: HomeState, action: string, data: ActData, os: OS): ActResult<Hom
     case "searchFocus":
       return done({ ...s, scr: "search" });
     case "openNotif":
-      return done({ ...s, scr: "notif" });
+    case "openQS": {
+      // remember what was under the panel; the panel slides on top of it
+      const shadeUnder = isPanel(s.scr) ? s.shadeUnder : s.scr;
+      return done({ ...s, scr: action === "openNotif" ? "notif" : "qs", shadeUnder, shadeClosing: "" });
+    }
     case "dismiss":
       return done({ ...s, notifs: s.notifs.filter((n) => n !== (data.n as StatusNotif)) });
     case "clearNotif":
       return done({ ...s, notifs: [] });
-    case "openQS":
-      return done({ ...s, scr: "qs" });
     case "tile": {
       const tile = data.tile as QuickTile;
       return done({ ...s, qs: { ...s.qs, [tile]: !s.qs[tile] } }, `tile:${tile}`);
@@ -120,6 +149,9 @@ export const homeModule: HouseModule<HomeState> = {
   },
 
   keyboardOpen: (s) => s.scr === "search",
+
+  // quick settings fill the screen with tiles: put the card at the far edge so it never covers them
+  cardAt: (s) => (s.scr === "qs" ? "far" : undefined),
 
   render: (s, os) => <HomePhone s={s} os={os} />,
 };

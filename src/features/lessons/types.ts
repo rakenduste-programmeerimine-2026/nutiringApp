@@ -42,4 +42,10 @@ export interface HouseModule<S> {
   render(state: S, os: OS): ReactNode;
   /** True when the on-screen keyboard is open (desktop typing goes to act "key"). */
   keyboardOpen?(state: S): boolean;
+  /**
+   * Where the guide card should go on phones when the step does not say (no `cardAt`).
+   * "far" = the opposite edge from the highlighted spot, e.g. so the card never
+   * covers other quick settings tiles. undefined = next to the highlighted spot.
+   */
+  cardAt?(state: S, step: Step, os: OS): "top" | "bottom" | "far" | undefined;
 }

@@ -3,6 +3,9 @@
 
 export type Box = { left: number; top: number; right: number; bottom: number };
 
+/** Where the guide card goes on phones; undefined = next to the target. */
+export type CardAt = "top" | "bottom" | "far";
+
 /** One box around all target elements (screen coordinates), or null. */
 export function unionBox(rects: Box[]): Box | null {
   const real = rects.filter((r) => r.right - r.left > 0 || r.bottom - r.top > 0);
@@ -43,7 +46,8 @@ export function cardPosition(opts: {
   target: Box | null;
   phone: Box;
   cardHeight: number;
-  cardAt?: "top" | "bottom";
+  /** "far" = at the opposite edge of the phone from the target (never over other buttons) */
+  cardAt?: CardAt;
 }): { top?: number; bottom?: number } {
   const { target, phone, cardHeight: ch, cardAt } = opts;
   const H = phone.bottom - phone.top;
@@ -53,6 +57,7 @@ export function cardPosition(opts: {
 
   const top = target.top - phone.top;
   const bot = target.bottom - phone.top;
+  if (cardAt === "far") return (top + bot) / 2 > H / 2 ? { top: 36 } : { bottom: 8 };
   const inLowerHalf = (top + bot) / 2 > H / 2;
   const noRoomBelow = bot + 14 + ch > H;
   if (inLowerHalf || noRoomBelow) {

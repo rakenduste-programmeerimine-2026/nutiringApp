@@ -28,17 +28,18 @@ type StatusBarProps = {
    * Android: `all` = whole bar. iPhone: `left` (notifications) / `right` (Control Center).
    */
   swipe?: { all?: string; left?: string; right?: string };
+  /** The panel follows the finger while it is pulled down (data-swipe-drag). */
+  swipeDrag?: boolean;
 };
-
-const swipeAttrs = (act?: string) =>
-  act ? { "data-swipe": "down", "data-swipe-act": act } : {};
 
 /**
  * Top row of the phone. Class names (sb-time, sb-notifs, sb-sound, sb-signal,
  * sb-wifi, sb-batt) are used by the lessons – do not rename them.
  */
-export function StatusBar({ os, light = false, notifs, sound = false, swipe = {} }: StatusBarProps) {
+export function StatusBar({ os, light = false, notifs, sound = false, swipe = {}, swipeDrag = false }: StatusBarProps) {
   const android = os === "android";
+  const swipeAttrs = (act?: string) =>
+    act ? { "data-swipe": "down", "data-swipe-act": act, ...(swipeDrag ? { "data-swipe-drag": "" } : {}) } : {};
   return (
     <div className={`sb${light ? " light" : ""}`} {...swipeAttrs(swipe.all)}>
       <div className="sbl" {...swipeAttrs(swipe.left)}>

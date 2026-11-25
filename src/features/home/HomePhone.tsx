@@ -3,7 +3,8 @@ import { AllApps } from "./screens/AllApps";
 import { CameraApp, ClockApp, GenericApp, Recents } from "./screens/AppScreens";
 import { LockScreen, PassScreen, SimScreen } from "./screens/CodeScreens";
 import { HomeScreen } from "./screens/HomeScreen";
-import { openApp, type HomeState } from "./state";
+import { Shade } from "./screens/Panels";
+import { isPanel, openApp, type HomeState } from "./state";
 import "./home.css";
 
 /**
@@ -14,7 +15,9 @@ import "./home.css";
 export function HomePhone({ s, os }: { s: HomeState; os: OS }) {
   return (
     <div className="homeph">
-      <CurrentScreen s={s} os={os} />
+      {/* with a panel open, the screen it was pulled down from stays underneath */}
+      <CurrentScreen s={isPanel(s.scr) ? { ...s, scr: s.shadeUnder } : s} os={os} />
+      <Shade s={s} os={os} />
       {/* brightness slider really dims the screen */}
       <div className="dimmer" style={{ opacity: (((100 - s.bright) / 100) * 0.6).toFixed(2) }} />
     </div>
@@ -39,7 +42,6 @@ function CurrentScreen({ s, os }: { s: HomeState; os: OS }) {
       return <AllApps s={s} os={os} />;
     case "recents":
       return <Recents s={s} os={os} />;
-    // notification panel and quick settings come in step c
     default:
       return <HomeScreen s={s} os={os} />;
   }

@@ -725,3 +725,239 @@
   opacity: 0.8;
   font-size: 17px;
 }
+
+/* ---------- pull-down panels (notifications, quick settings) ---------- */
+.phone .homeph .shadewrap {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  will-change: transform;
+}
+.phone .homeph .shade {
+  flex: 1;
+  background: rgba(32, 36, 48, 0.92);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  gap: 10px;
+  overflow: auto;
+  position: relative;
+  min-height: 0;
+}
+.phone.ios .homeph .shade {
+  background: rgba(40, 44, 60, 0.55);
+  backdrop-filter: blur(20px);
+}
+.phone .homeph .shdate {
+  font-size: 15px;
+  font-weight: 600;
+}
+.phone .homeph .shtime {
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+}
+.phone .homeph .notif {
+  background: rgba(255, 255, 255, 0.95);
+  color: #111;
+  border-radius: 20px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  touch-action: none;
+  flex: none;
+}
+.phone .homeph .notif .ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phone.ios .homeph .notif .ic {
+  border-radius: 9px;
+}
+.phone .homeph .notif .ic svg {
+  width: 60%;
+  height: 60%;
+}
+.phone .homeph .nbody {
+  flex: 1;
+  min-width: 0;
+}
+.phone .homeph .notif .nt {
+  font-weight: 700;
+  font-size: 15px;
+}
+.phone .homeph .notif .nb {
+  font-size: 15px;
+  color: #333;
+}
+.phone .homeph .notif .nm {
+  font-size: 12px;
+  color: #666;
+}
+.phone .homeph .ntime {
+  font-weight: 900;
+  color: #1d1d1f;
+}
+.phone .homeph .clearall {
+  align-self: flex-end;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.phone .homeph .nonotif {
+  text-align: center;
+  opacity: 0.8;
+  margin-top: 40px;
+  font-size: 17px;
+}
+.phone .homeph .shadehandle {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 6px;
+  touch-action: none;
+}
+.phone .homeph .shadehandle i {
+  width: 60px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* quick settings tiles */
+.phone .homeph .qsgrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.phone .homeph .tile {
+  border: none;
+  border-radius: 22px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #3b4152;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+.phone .homeph .tile small {
+  display: block;
+  font-weight: 500;
+  opacity: 0.8;
+}
+.phone .homeph .tile.on {
+  background: #a8c7fa;
+  color: #062e6f;
+}
+.phone .homeph .tile svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.phone .homeph .ccrow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.phone.ios .homeph .qsgrid {
+  flex: 1;
+  grid-template-columns: repeat(3, 1fr);
+}
+.phone.ios .homeph .tile {
+  flex-direction: column;
+  justify-content: center;
+  min-height: 72px;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  padding: 6px;
+  font-size: 10.5px;
+  text-align: center;
+  gap: 3px;
+}
+.phone.ios .homeph .tile.on {
+  background: #fff;
+  color: #0a60ff;
+}
+.phone.ios .homeph .tile.on.orange {
+  color: #ff9500;
+}
+
+/* brightness */
+.phone .homeph .bright {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #3b4152;
+  border-radius: 22px;
+  padding: 14px;
+  color: #fff;
+}
+.phone .homeph .bright svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.phone .homeph .bright .bar {
+  flex: 1;
+  height: 16px;
+  border-radius: 8px;
+  background: #5c6378;
+  position: relative;
+  cursor: pointer;
+  touch-action: none;
+}
+.phone .homeph .bright .bar i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #a8c7fa;
+  border-radius: 8px;
+}
+.phone .homeph .vbright {
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 72px;
+  height: 150px;
+  padding: 10px;
+  cursor: pointer;
+  touch-action: none;
+}
+.phone .homeph .vbright .vfill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+}
+.phone .homeph .vbright svg {
+  position: relative;
+  z-index: 1;
+  color: #888;
+  margin-bottom: 4px;
+}
+.phone .homeph .torchglow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: radial-gradient(ellipse at top, rgba(255, 250, 200, 0.6), transparent 70%);
+  pointer-events: none;
+}

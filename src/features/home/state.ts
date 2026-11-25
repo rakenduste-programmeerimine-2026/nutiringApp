@@ -39,7 +39,19 @@ export type HomeState = {
   recents: AppKey[]; // open apps
   /** how far the finger is pulling the lock screen up right now (px, ≤ 0) */
   lockPull: number;
+  /** notification / quick settings panel: how far the finger pulls it right now (px) */
+  shadePull: number;
+  /** the screen under the open panel (where it was pulled down from) */
+  shadeUnder: Screen;
+  /** the panel is sliding up after closing (kept on screen for the animation) */
+  shadeClosing: "" | "notif" | "qs";
 };
+
+/** Is this screen one of the pull-down panels? */
+export const isPanel = (scr: Screen) => scr === "notif" || scr === "qs";
+
+/** How long the panel takes to slide open / closed (ms). */
+export const PANEL_ANIM_MS = 250;
 
 export const START_BRIGHTNESS = 65;
 
@@ -60,6 +72,9 @@ export const initialHome = (emojiKey = false): HomeState => ({
   clockPage: "clock",
   recents: ["browser"],
   lockPull: 0,
+  shadePull: 0,
+  shadeUnder: "home",
+  shadeClosing: "",
 });
 
 /** The app on screen, if the screen is an opened app. */

@@ -135,6 +135,15 @@
   height: 44px;
   padding: 0 26px;
 }
+/* iPhone: left half = notifications, right half = Control Center, so each
+   side covers its whole half (for touching and for the lesson highlight) */
+.phone.ios .sb .sbl,
+.phone.ios .sb .sbr {
+  flex: 1;
+}
+.phone.ios .sb .sbr {
+  justify-content: flex-end;
+}
 .phone .sbi {
   display: inline-flex;
   align-items: center;
