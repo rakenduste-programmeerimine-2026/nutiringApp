@@ -2,7 +2,15 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { House } from "@/content/types";
 import { DELAY, LessonHouse, type HouseModule } from "@/features/lessons";
-import { FOLLOW_MIN, SWIPE_ANIM_MS, followDone, swipeOffset } from "@/features/lessons/gestures";
+import {
+  DRAG_FRACTION,
+  FLICK_MS,
+  FOLLOW_MIN,
+  SWIPE_ANIM_MS,
+  dragDone,
+  followDone,
+  swipeOffset,
+} from "@/features/lessons/gestures";
 
 /* ---------- fake house: a card that follows the finger, a panel pulled by a drag ---------- */
 type S = { card: boolean; pull: number; dragEnds: string[]; open: boolean };
@@ -75,6 +83,15 @@ describe("helpers", () => {
     expect(swipeOffset("up", 0, 40)).toEqual({ x: 0, y: 0 }); // can't pull an "up" element down
     expect(swipeOffset("down", 10, 40)).toEqual({ x: 0, y: 40 });
     expect(swipeOffset("side", -70, 20)).toEqual({ x: -70, y: 0 });
+  });
+
+  it("a pull (lock screen, panel) needs 35 % of the screen when slow, or a quick flick", () => {
+    const screenHeight = 600; // 35 % = 210 px
+    expect(dragDone("up", 0, -150, screenHeight, 800)).toBe(false); // slow, half-way → slides back
+    expect(dragDone("up", 0, -DRAG_FRACTION * screenHeight, screenHeight, 800)).toBe(true); // slow, far enough
+    expect(dragDone("up", 0, -70, screenHeight, FLICK_MS - 100)).toBe(true); // quick flick
+    expect(dragDone("up", 0, -30, screenHeight, 50)).toBe(false); // too tiny even for a flick
+    expect(dragDone("up", 0, 300, screenHeight, 800)).toBe(false); // wrong direction
   });
 
   it("a moving swipe needs at least FOLLOW_MIN pixels", () => {

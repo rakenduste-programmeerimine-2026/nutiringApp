@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { expect, it } from "vitest";
 import { RichText } from "@/features/lessons/RichText";
 
-const html = (text: string) => render(<p data-testid="t"><RichText text={text} /></p>).container.innerHTML;
+const html = (text: string) => render(<div data-testid="t"><RichText text={text} /></div>).container.innerHTML;
 
 it("keeps the allowed formatting", () => {
   expect(html("Vajuta <b>OK</b>.")).toContain("Vajuta <b>OK</b>.");

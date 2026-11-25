@@ -4,6 +4,7 @@ export { PhoneStage } from "./PhoneStage";
 export { StatusBar, type StatusNotif } from "./StatusBar";
 export { NavBar } from "./NavBar";
 export { Keyboard } from "./Keyboard";
+export { PinPad, PinDots, pinPress } from "./PinPad";
 export {
   applyKey,
   openAccents,
@@ -18,6 +19,6 @@ export {
   type KeyboardMode,
   type KeyboardState,
 } from "./keyboardLogic";
-export { APPS, AppIcon, AppTile, appName, appNameForText, type AppKey } from "./apps";
+export { APPS, AppIcon, AppTile, appGlyph, appName, appNameForText, type AppKey } from "./apps";
 export { t, PHONE_TIME } from "./strings";
 export * from "./icons";

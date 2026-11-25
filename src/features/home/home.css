@@ -1,0 +1,150 @@
+/* Home screen replica styles, copied from the prototype.
+   GLOBAL class names on purpose: the lessons (src/content/lessons/home.ts)
+   find elements by them. Everything is scoped under .phone. */
+
+/* ---------- brightness ---------- */
+.phone .dimmer {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 40;
+}
+
+/* ---------- code screens (SIM PIN, screen lock) ---------- */
+.phone .pinscr {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 96px 16px 8px;
+}
+.phone .pinscr.dark {
+  background: #1c1c1e;
+  color: #fff;
+}
+.phone .pinbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  margin-top: 10px;
+}
+.phone .pinbox .pt {
+  font-size: 19px;
+  font-weight: 600;
+  text-align: center;
+}
+.phone .pinbox .ps {
+  font-size: 14px;
+  opacity: 0.7;
+  text-align: center;
+}
+.phone .pinerr {
+  color: #ff6b6b;
+  font-weight: 700;
+  font-size: 15px;
+  min-height: 20px;
+}
+@media (max-width: 899px) {
+  .phone .pinscr {
+    padding-top: min(150px, 17vh);
+  }
+  .phone .pinbox {
+    gap: 4px;
+    margin-top: 4px;
+    padding: 6px 10px;
+  }
+  .phone .pinbox .pt {
+    font-size: 17px;
+  }
+}
+
+/* ---------- lock screen ---------- */
+.phone .lock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+}
+.phone .lock .lt {
+  font-size: 78px;
+  font-weight: 300;
+  line-height: 1;
+  margin-top: 40px;
+}
+.phone.ios .lock .lt {
+  font-weight: 700;
+  font-size: 86px;
+  margin-top: 20px;
+}
+.phone .lock .ld {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.phone.ios .lock .ld {
+  order: -1;
+  margin-top: 24px;
+}
+.phone .lock .sp {
+  flex: 1;
+}
+.phone .lockrow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 22px 8px;
+}
+.phone .lkbtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex: none;
+}
+.phone .lkbtn svg {
+  width: 24px;
+  height: 24px;
+}
+.phone .swipeup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 10px 6px;
+  border-radius: 20px;
+}
+.phone .swipeup svg {
+  width: 28px;
+  height: 28px;
+  animation: bob 1.4s ease-in-out infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone .swipeup svg {
+    animation: none;
+  }
+}
+
+/* ---------- home screen ---------- */
+.phone .home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
