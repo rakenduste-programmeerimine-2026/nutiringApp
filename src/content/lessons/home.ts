@@ -57,6 +57,58 @@ const goHome = (): Step =>
     "goHome",
   );
 
+type Tile = "wifi" | "data" | "torch" | "silent" | "rotate" | "plane";
+
+const WIFI_TEXT =
+  "<b>Wi-Fi:</b> traadita internet kodus või kohvikus. Kui telefon ei ole Wi-Fi-ga ühendatud, kasutab ta internetiks <b>mobiilset andmesidet</b>, kui see on sisse lülitatud.";
+
+/** One explanation per quick-settings tile. */
+const TILE_TEXT: Record<Tile, { android: string; ios: string }> = {
+  wifi: { android: WIFI_TEXT, ios: WIFI_TEXT },
+  data: {
+    android:
+      "<b>Mobiilne andmeside:</b> internet SIM-kaardi kaudu. Seda kasutatakse siis, kui Wi-Fit pole.",
+    ios: "<b>Cellular (mobiilne andmeside):</b> internet SIM-kaardi kaudu. Seda kasutatakse siis, kui Wi-Fit pole.",
+  },
+  torch: {
+    android: "<b>Taskulamp:</b> telefoni tagaküljel süttib tuli.",
+    ios: "<b>Flashlight (taskulamp):</b> telefoni tagaküljel süttib tuli.",
+  },
+  silent: {
+    android:
+      "<b>Vaikne režiim:</b> telefon ei helise kõnede ja sõnumite peale.",
+    ios: "<b>Silent Mode (vaikne režiim):</b> telefon ei helise kõnede ja sõnumite peale.",
+  },
+  rotate: {
+    android:
+      "<b>Automaatne pööramine:</b> kui see on sees, keerab ekraan end koos telefoniga külili.",
+    ios: "<b>Orientation Lock</b> (pööramislukk): kui see on sees, ei keera ekraan end külili.",
+  },
+  plane: {
+    android:
+      "<b>Lennurežiim:</b> lülitab välja kõned, interneti ja Wi-Fi, näiteks lennukis.",
+    ios: "<b>Airplane Mode (lennurežiim):</b> lülitab välja kõned, interneti ja Wi-Fi, näiteks lennukis.",
+  },
+};
+
+/**
+ * The order of the tiles on screen, top-left → right, row by row. The iPhone replica
+ * keeps the real Control Center layout, so each step shows a different tile per system.
+ */
+const TILE_ORDER: { android: Tile[]; ios: Tile[] } = {
+  android: ["wifi", "data", "torch", "silent", "rotate", "plane"],
+  ios: ["plane", "data", "wifi", "rotate", "torch", "silent"],
+};
+
+const tileSteps = (): Step[] =>
+  TILE_ORDER.android.map((android, i) => {
+    const ios = TILE_ORDER.ios[i];
+    return info(
+      T(TILE_TEXT[android].android, TILE_TEXT[ios].ios),
+      T(`[data-tile=${android}]`, `[data-tile=${ios}]`),
+    );
+  });
+
 // Source: prototype „Nutiküla – Nutiring" (HOME.lessons), version 20.11.2026.
 export const home: House = {
   title: "Avaekraan",
@@ -264,49 +316,7 @@ export const home: House = {
           },
           ".qsgrid",
         ),
-        info(
-          "<b>Wi-Fi:</b> traadita internet kodus või kohvikus. Kui telefon ei ole Wi-Fi-ga ühendatud, kasutab ta internetiks <b>mobiilset andmesidet</b>, kui see on sisse lülitatud.",
-          "[data-tile=wifi]",
-        ),
-        info(
-          {
-            android:
-              "<b>Mobiilne andmeside:</b> internet SIM-kaardi kaudu. Seda kasutatakse siis, kui Wi-Fit pole.",
-            ios: "<b>Cellular (mobiilne andmeside):</b> internet SIM-kaardi kaudu. Seda kasutatakse siis, kui Wi-Fit pole.",
-          },
-          "[data-tile=data]",
-        ),
-        info(
-          {
-            android: "<b>Taskulamp:</b> telefoni tagaküljel süttib tuli.",
-            ios: "<b>Flashlight (taskulamp):</b> telefoni tagaküljel süttib tuli.",
-          },
-          "[data-tile=torch]",
-        ),
-        info(
-          {
-            android:
-              "<b>Vaikne režiim:</b> telefon ei helise kõnede ja sõnumite peale.",
-            ios: "<b>Silent Mode (vaikne režiim):</b> telefon ei helise kõnede ja sõnumite peale.",
-          },
-          "[data-tile=silent]",
-        ),
-        info(
-          {
-            android:
-              "<b>Automaatne pööramine:</b> kui see on sees, keerab ekraan end koos telefoniga külili.",
-            ios: "<b>Orientation Lock</b> (pööramislukk): kui see on sees, ei keera ekraan end külili.",
-          },
-          "[data-tile=rotate]",
-        ),
-        info(
-          {
-            android:
-              "<b>Lennurežiim:</b> lülitab välja kõned, interneti ja Wi-Fi, näiteks lennukis.",
-            ios: "<b>Airplane Mode (lennurežiim):</b> lülitab välja kõned, interneti ja Wi-Fi, näiteks lennukis.",
-          },
-          "[data-tile=plane]",
-        ),
+        ...tileSteps(),
         check(
           {
             android:
